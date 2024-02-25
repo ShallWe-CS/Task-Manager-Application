@@ -66,8 +66,8 @@ function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
                       <p className=" text-lg font-bold ">{board.name}</p>
                     </div>
                   ))}
-
-                  <div
+                  {/* create a new board function call */}
+                  {/* <div
                     className=" flex  items-baseline space-x-2  mr-8 rounded-r-full duration-500 ease-in-out cursor-pointer text-[#635fc7] px-5 py-4 hover:bg-[#635fc71a] hover:text-[#635fc7] dark:hover:bg-white  "
                     onClick={() => {
                       setIsBoardModalOpen(true);
@@ -75,10 +75,10 @@ function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
                   >
                     <img src={boardIcon} className="   filter-white  h-4 " />
                     <p className=" text-lg font-bold  ">Create New Board </p>
-                  </div>
+                  </div> */}
                 </div>
 
-                <div className=" mx-2  p-4 relative space-x-2 bg-slate-100 dark:bg-[#20212c] flex justify-center items-center rounded-lg">
+                {/* <div className=" mx-2  p-4 relative space-x-2 bg-slate-100 dark:bg-[#20212c] flex justify-center items-center rounded-lg">
                   <img src={lightIcon} alt="sun indicating light mode" />
 
                   <Switch
@@ -96,13 +96,13 @@ function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
                   </Switch>
 
                   <img src={darkIcon} alt="moon indicating dark mode" />
-                </div>
+                </div> */}
               </div>
             </div>
           )}
 
           {/* Sidebar hide/show toggle */}
-          {isSideBarOpen ? (
+          {/* {isSideBarOpen ? (
             <div
               onClick={() => toggleSidebar()}
               className=" flex  items-center mt-2  absolute bottom-16  text-lg font-bold  rounded-r-full hover:text-[#635FC7] cursor-pointer mr-6 mb-8 px-8 py-4 hover:bg-[#635fc71a] dark:hover:bg-white  space-x-2 justify-center  my-4 text-gray-500 "
@@ -118,7 +118,7 @@ function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
             <div className=" absolute p-5  " onClick={() => toggleSidebar()}>
               <img src={showSidebarIcon} alt="showSidebarIcon" />
             </div>
-          )}
+          )} */}
         </div>
       </div>
 
