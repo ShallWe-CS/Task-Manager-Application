@@ -4,12 +4,31 @@ import AddEditBoardModal from "../modals/AddEditBoardModal";
 import Column from "./Column";
 import EmptyBoard from "./EmptyBoard";
 import Sidebar from "./Sidebar";
+import axios from "axios";
 
 function Home() {
   const [windowSize, setWindowSize] = useState([
     window.innerWidth,
     window.innerHeight,
   ]);
+  const [data, setData] = useState([]);
+
+  // Function to fetch data using Axios
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/task/get_all/");
+      setData(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+   // Call fetchData on component mount
+   useEffect(() => {
+    fetchData();
+  }, []);
+
+  console.log(data);
 
   useEffect(() => {
     const handleWindowResize = () => {

@@ -9,10 +9,10 @@ from rest_framework import status
 @api_view(['GET'])
 def get_all_tasks(request):
     # Retrieve all products from the database
-    products = Task.objects.all()
+    tasks = Task.objects.all()
 
     # Serialize the products data
-    serializer = TaskSerializer(products, many=True)
+    serializer = TaskSerializer(tasks, many=True)
 
     # Return the serialized data in the response
     return Response(serializer.data)
