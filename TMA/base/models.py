@@ -28,3 +28,9 @@ class Task(models.Model):
     description = models.TextField()
     status = models.CharField(max_length=255)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
+    
+class Goboard(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    status = models.CharField(max_length=255)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)

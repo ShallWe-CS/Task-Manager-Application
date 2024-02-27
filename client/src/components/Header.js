@@ -55,7 +55,7 @@ function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
         <div className=" flex items-center space-x-2  md:space-x-4">
           <img src={Logo} alt=" Logo " className=" h-6 w-6" />
           <h3 className=" md:text-4xl  hidden md:inline-block font-bold  font-sans">
-            kanban
+            goboard
           </h3>
           <div className=" flex items-center ">
             <h3 className=" truncate max-w-[200px] md:text-2xl text-xl font-bold md:ml-20 font-sans  ">
@@ -100,13 +100,13 @@ function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
             alt="elipsis"
             className=" cursor-pointer h-6"
           />
-          {isElipsisMenuOpen && (
+          {/* {isElipsisMenuOpen && (
             <ElipsisMenu
               type="Boards"
               setOpenEditModal={setOpenEditModal}
               setOpenDeleteModal={setOpenDeleteModal}
             />
-          )}
+          )} */}
         </div>
 
         {openDropdown && (
