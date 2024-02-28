@@ -21,16 +21,12 @@ class CustomUser(AbstractUser):
     
 class Board(models.Model):
     name = models.CharField(max_length=255)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
+    ownerId = models.IntegerField(default=1)
+    users = models.ManyToManyField(CustomUser)
 
 class Task(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     status = models.CharField(max_length=255)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
-    
-class Goboard(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    status = models.CharField(max_length=255)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
+    board = models.ForeignKey(Board, on_delete=models.CASCADE, default=1)
