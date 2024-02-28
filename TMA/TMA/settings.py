@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     
     "corsheaders",
     
-    "corsheaders",
     'base',
     'rest_framework'
 ]
