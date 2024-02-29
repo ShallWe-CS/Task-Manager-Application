@@ -12,6 +12,4 @@ router.register('columns', ColumnViewSet, basename='column')
 urlpatterns = router.urls
 
 # urlpatterns = [ 
-#     path('task/get_all/',   views.get_all_tasks),
-#     path('task/add_edit/',  views.add_edit_task)
 # ] + router.urls

@@ -10,6 +10,7 @@ import showSidebarIcon from "../assets/icon-show-sidebar.svg";
 import hideSidebarIcon from "../assets/icon-hide-sidebar.svg";
 
 import boardsSlice from "../redux/boardsSlice";
+import boardsSliceNew from "../redux/boardsSliceNew";
 import AddEditBoardModal from "../modals/AddEditBoardModal";
 
 function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
@@ -26,6 +27,8 @@ function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
   };
 
   const boards = useSelector((state) => state.boards);
+  const boardsNew = useSelector((state) => state.boardsNew.boards);
+  const currentBoard = useSelector((state) => state.boardsNew.currentBoard);
 
   const toggleSidebar = () => {
     setIsSideBarOpen((curr) => !curr);
@@ -46,20 +49,21 @@ function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
           {isSideBarOpen && (
             <div className=" bg-white  dark:bg-[#2b2c37]    w-full   py-4 rounded-xl">
               <h3 className=" dark:text-gray-300 text-gray-600 font-semibold mx-4 mb-8 ">
-                ALL BOARDS ({boards?.length})
+                ALL BOARDS ({boardsNew?.length})
               </h3>
 
               <div className="  dropdown-borad flex flex-col h-[70vh]  justify-between ">
                 <div>
-                  {boards.map((board, index) => (
+                  {boardsNew.map((board, index) => (
                     <div
                       className={` flex items-baseline space-x-2 px-5 mr-8 rounded-r-full duration-500 ease-in-out py-4 cursor-pointer hover:bg-[#635fc71a] hover:text-[#635fc7] dark:hover:bg-white dark:hover:text-[#635fc7] dark:text-white  ${
-                        board.isActive &&
+                        (currentBoard.name == board.name) &&
                         " bg-[#635fc7] rounded-r-full text-white mr-8 "
                       } `}
                       key={index}
                       onClick={() => {
-                        dispatch(boardsSlice.actions.setBoardActive({ index }));
+                        // dispatch(boardsSlice.actions.setBoardActive({ index }));
+                        dispatch(boardsSliceNew.actions.setCurrentBoard({ index }));
                       }}
                     >
                       <img src={boardIcon} className="  filter-white  h-4 " />{" "}
