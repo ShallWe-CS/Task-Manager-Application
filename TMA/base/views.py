@@ -1,7 +1,6 @@
 from .models import Task, Board, Column
 from .serializers import TaskSerializer, BoardSerializer, ColumnSerializer
 from rest_framework import viewsets
-  
 # Create your views here.
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()

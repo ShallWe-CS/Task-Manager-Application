@@ -30,8 +30,6 @@ function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
   const boardsNew = useSelector((state) => state.boardsNew.boards);
   const currentBoard = useSelector((state) => state.boardsNew.currentBoard);
 
-  console.log('boardsNEw: ', currentBoard)
-
   const toggleSidebar = () => {
     setIsSideBarOpen((curr) => !curr);
   };

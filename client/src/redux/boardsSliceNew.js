@@ -23,7 +23,6 @@ const boardsSliceNew = createSlice({
 
             // If a matching board is found, set it as currentBoard
             if (selectedBoard) {
-                console.log('selectedBoard to currentBoard: ', selectedBoard)
                 state.currentBoard = selectedBoard;
             }
         },

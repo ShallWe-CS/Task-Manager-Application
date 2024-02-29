@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import boardsSlice from "../redux/boardsSlice";
 import Task from "./Task";
 
-function Column({ colIndex }) {
+function Column({ colIndex, columnDetails }) {
   const colors = [
     "bg-red-500",
     "bg-orange-500",
@@ -54,11 +54,11 @@ function Column({ colIndex }) {
     >
       <p className=" font-semibold flex  items-center  gap-2 tracking-widest md:tracking-[.2em] text-[#828fa3]">
         <div className={`rounded-full w-4 h-4 ${color} `} />
-        {col.name} ({col.tasks.length})
+        {columnDetails.name} ({col.tasks.length})
       </p>
 
-      {col.tasks.map((task, index) => (
-        <Task key={index} taskIndex={index} colIndex={colIndex} />
+      {columnDetails?.tasks.map((task, index) => (
+        <Task key={index} taskIndex={index} colIndex={colIndex} taskDetails={task} />
       ))}
     </div>
   );

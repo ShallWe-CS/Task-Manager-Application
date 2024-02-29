@@ -4,26 +4,21 @@ import AddEditBoardModal from "../modals/AddEditBoardModal";
 import Column from "./Column";
 import EmptyBoard from "./EmptyBoard";
 import Sidebar from "./Sidebar";
-import axios from "axios";
-import { fetchAsyncBoards, getAllBoards } from "../redux/boardsSliceNew";
+import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
 function Home() {
   const [windowSize, setWindowSize] = useState([
     window.innerWidth,
     window.innerHeight,
   ]);
-  const [data, setData] = useState([]);
   const dispatch = useDispatch();
 
    useEffect(() => {
     dispatch(fetchAsyncBoards());
   }, []);
 
-  const boardsNew = useSelector((state) => state.boardsNew.boards);
   const currentboard = useSelector((state) => state.boardsNew.currentBoard);
-
-  console.log('boardsNew: ', boardsNew)
-  console.log('currentboard: ', currentboard)
+  const columnsNew = currentboard.columns;
 
   useEffect(() => {
     const handleWindowResize = () => {
@@ -64,10 +59,10 @@ function Home() {
 
       {/* Columns Section */}
 
-      {columns.length > 0 ? (
+      {columnsNew?.length > 0 ? (
         <>
-          {columns.map((col, index) => (
-            <Column key={index} colIndex={index} />
+          {columnsNew.map((column, index) => (
+            <Column key={index} colIndex={index} columnDetails={column} />
           ))}
           {<div
             onClick={() => {
