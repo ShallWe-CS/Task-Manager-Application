@@ -4,13 +4,30 @@ import { STATUS } from "../utils/status";
 
 const initialState = {
     boards: [],
-    boardsStatus: STATUS.IDLE
+    dummy: {
+        name: 'kethaka'
+    },
+    boardsStatus: STATUS.IDLE,
+    currentBoard: {}
 }
 
 const boardsSliceNew = createSlice({
     name: "boardsNew",
     initialState,
-    reducers: {},
+    reducers: {
+        setCurrentBoard: (state, action) => {
+            const { index } = action.payload;
+
+            // Find the board that matches the index
+            const selectedBoard = state.boards.find((board, i) => i === index);
+
+            // If a matching board is found, set it as currentBoard
+            if (selectedBoard) {
+                console.log('selectedBoard to currentBoard: ', selectedBoard)
+                state.currentBoard = selectedBoard;
+            }
+        },
+    },
     extraReducers: (builder) => {
         builder
         .addCase(fetchAsyncBoards.pending, (state, action) => {
@@ -19,6 +36,7 @@ const boardsSliceNew = createSlice({
 
         .addCase(fetchAsyncBoards.fulfilled, (state, action) => {
             state.boards = action.payload;
+            state.currentBoard = action.payload[0];
             state.boardsStatus = STATUS.SUCCEEDED;
         })
         
@@ -30,9 +48,9 @@ const boardsSliceNew = createSlice({
 
 export const fetchAsyncBoards = createAsyncThunk('boards/fetch', async(limit) => {
     const response = await fetchDataFromApi("/api/boards/");
-    return response.data;
+    return response;
 });
 
-export const getAllBoards = (state) => state.boards.boards;
+export const getAllBoards = (state) => state.boardsNew.boards;
 
-export default boardsSliceNew.reducer;
+export default boardsSliceNew;

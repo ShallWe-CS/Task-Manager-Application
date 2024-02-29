@@ -19,9 +19,11 @@ function Home() {
     dispatch(fetchAsyncBoards());
   }, []);
 
-  const products = useSelector(getAllBoards);
+  const boardsNew = useSelector((state) => state.boardsNew.boards);
+  const currentboard = useSelector((state) => state.boardsNew.currentBoard);
 
-  console.log('products: ', products)
+  console.log('boardsNew: ', boardsNew)
+  console.log('currentboard: ', currentboard)
 
   useEffect(() => {
     const handleWindowResize = () => {
