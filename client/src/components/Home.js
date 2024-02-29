@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddEditBoardModal from "../modals/AddEditBoardModal";
 import Column from "./Column";
 import EmptyBoard from "./EmptyBoard";
 import Sidebar from "./Sidebar";
 import axios from "axios";
+import { fetchAsyncBoards, getAllBoards } from "../redux/boardsSliceNew";
 
 function Home() {
   const [windowSize, setWindowSize] = useState([
@@ -12,23 +13,15 @@ function Home() {
     window.innerHeight,
   ]);
   const [data, setData] = useState([]);
+  const dispatch = useDispatch();
 
-  // Function to fetch data using Axios
-  const fetchData = async () => {
-    try {
-      const response = await axios.get("http://127.0.0.1:8000/api/task/get_all/");
-      setData(response.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-   // Call fetchData on component mount
    useEffect(() => {
-    fetchData();
+    dispatch(fetchAsyncBoards());
   }, []);
 
-  console.log(data);
+  const products = useSelector(getAllBoards);
+
+  console.log('products: ', products)
 
   useEffect(() => {
     const handleWindowResize = () => {
@@ -74,14 +67,14 @@ function Home() {
           {columns.map((col, index) => (
             <Column key={index} colIndex={index} />
           ))}
-          {/* <div
+          {<div
             onClick={() => {
               setIsBoardModalOpen(true);
             }}
             className=" h-screen dark:bg-[#2b2c3740] flex justify-center items-center font-bold text-2xl hover:text-[#635FC7] transition duration-300 cursor-pointer bg-[#E9EFFA] scrollbar-hide mb-2   mx-5 pt-[90px] min-w-[280px] text-[#828FA3] mt-[135px] rounded-lg "
           >
             + New Column
-          </div> */}
+          </div>}
         </>
       ) : (
         <>
