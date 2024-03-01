@@ -15,5 +15,6 @@ router.register('columns', ColumnViewSet, basename='column')
 urlpatterns = [ 
     path('token/',          views.MyTokenObtainPairView.as_view()),
     path('token/refresh/',  TokenRefreshView.as_view(), name='token_refresh'),
+    path('register/',       views.UserRegistrationView.as_view()),
 
 ] + router.urls

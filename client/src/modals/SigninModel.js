@@ -3,6 +3,8 @@ import crossIcon from "../assets/icon-cross.svg";
 import boardsSlice from "../redux/boardsSlice";
 import { v4 as uuidv4 } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { login } from "../redux/authSlice";
 
 function SigninModel({ setIsSigninModalOpen, type , }) {
   const dispatch = useDispatch();
@@ -58,13 +60,31 @@ function SigninModel({ setIsSigninModalOpen, type , }) {
     setNewColumns((prevState) => prevState.filter((el) => el.id !== id));
   };
 
-  const onSubmit = (type) => {
-    setIsSigninModalOpen(false);
-    if (type === "add") {
-      dispatch(boardsSlice.actions.addBoard({ name, newColumns }));
+  const Register = async () => {
+    if (type === "Signin") {
+      const response = await axios.post('http://127.0.0.1:8000/api/register/', {
+        username: username,
+        email: email,
+        password: password
+      });
     } else {
-      dispatch(boardsSlice.actions.editBoard({ name, newColumns }));
+      const data = {
+        username: username,
+        password: password
+      }
+      dispatch(login(data));
     }
+    setIsSigninModalOpen(false);
+  }
+
+  const onSubmit = (type) => {
+    Register()
+    // setIsSigninModalOpen(false);
+    // if (type === "add") {
+    //   dispatch(boardsSlice.actions.addBoard({ name, newColumns }));
+    // } else {
+    //   dispatch(boardsSlice.actions.editBoard({ name, newColumns }));
+    // }
   };
 
   return (
@@ -82,7 +102,7 @@ function SigninModel({ setIsSigninModalOpen, type , }) {
        shadow-md shadow-[#364e7e1a] max-w-md mx-auto my-auto w-full px-8  py-8 rounded-xl"
       >
         <h3 className=" text-lg ">
-          {type === "edit" ? "Edit" : "Add New"} Board
+          {type === "Signin" ? "Signin" : "Login"}
         </h3>
 
         {/* Task Name */}
@@ -99,6 +119,7 @@ function SigninModel({ setIsSigninModalOpen, type , }) {
           />
         </div>
 
+        {type === "Signin" && 
         <div className="mt-8 flex flex-col space-y-1">
           <label className="  text-sm dark:text-white text-gray-500">
             Email
@@ -109,7 +130,7 @@ function SigninModel({ setIsSigninModalOpen, type , }) {
             onChange={(e) => setEmail(e.target.value)}
             id="board-name-input"
           />
-        </div>
+        </div>}
 
         <div className="mt-8 flex flex-col space-y-1">
           <label className="  text-sm dark:text-white text-gray-500">
@@ -127,14 +148,17 @@ function SigninModel({ setIsSigninModalOpen, type , }) {
 
         <div className="mt-8 flex flex-col space-y-3">
           <div>
+            {type === "Signin" && 
+            <li onClick={() => {}}>Has Account?</li>}
             <button
-              onClick={() => {
-                const isValid = validate();
-                if (isValid === true) onSubmit(type);
-              }}
+              onClick={() => Register()}
+              // onClick={() => {
+              //   const isValid = validate();
+              //   if (isValid === true) onSubmit(type);
+              // }}
               className=" w-full items-center hover:opacity-70 dark:text-white dark:bg-[#635fc7] mt-8 relative  text-white bg-[#635fc7] py-2 rounded-full"
             >
-              {type === "add" ? "Create New Board" : "Save Changes"}
+              {type === "Signin" ? "Create Account" : "Login"}
             </button>
           </div>
         </div>
