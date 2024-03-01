@@ -10,6 +10,8 @@ import AddEditBoardModal from "../modals/AddEditBoardModal";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteModal from "../modals/DeleteModal";
 import boardsSlice from "../redux/boardsSlice";
+import SigninModel from "../modals/SigninModel";
+import { jwtDecode } from "jwt-decode";
 
 function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
   const [openDropdown, setOpenDropdown] = useState(false);
@@ -17,11 +19,16 @@ function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
   const [boardType, setBoardType] = useState("add");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isSigninModelOpen, setIsSigninModalOpen] = useState(false);
 
   const dispatch = useDispatch();
   
   const boards = useSelector((state) => state.boards);
+  const auth = useSelector((state) => state.auth);
   const board = boards.find((board) => board.isActive);
+
+  const decodedToken = jwtDecode(auth.authTokens.access);
+  console.log('decoded')
 
   const onDropdownClick = () => {
     setOpenDropdown((state) => !state);
@@ -73,6 +80,7 @@ function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
         {/* Right Side */}
 
         <div className=" flex space-x-4 items-center md:space-x-6 ">
+          <h2>Hi {decodedToken.username}!</h2>
           <button
             className=" button hidden md:block "
             onClick={() => {
@@ -80,6 +88,14 @@ function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
             }}
           >
             + Add New Task
+          </button>
+          <button
+            className=" button hidden md:block "
+            onClick={() => {
+              setIsSigninModalOpen((prevState) => !prevState);
+            }}
+          >
+            Sign in
           </button>
           <button
             onClick={() => {
@@ -100,13 +116,13 @@ function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
             alt="elipsis"
             className=" cursor-pointer h-6"
           />
-          {/* {isElipsisMenuOpen && (
+          {isElipsisMenuOpen && (
             <ElipsisMenu
               type="Boards"
               setOpenEditModal={setOpenEditModal}
               setOpenDeleteModal={setOpenDeleteModal}
             />
-          )} */}
+          )}
         </div>
 
         {openDropdown && (
@@ -120,6 +136,14 @@ function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
         <AddEditTaskModal
           setIsAddTaskModalOpen={setIsTaskModalOpen}
           type="add"
+          device="mobile"
+        />
+      )}
+      {isSigninModelOpen && (
+        <SigninModel
+          setIsSigninModalOpen={setIsSigninModalOpen}
+          // type="add"
+          type="login"
           device="mobile"
         />
       )}
