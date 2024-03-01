@@ -28,6 +28,7 @@ function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
   const board = boards.find((board) => board.isActive);
 
   const decodedToken = jwtDecode(auth.authTokens.access);
+  console.log('decoded')
 
   const onDropdownClick = () => {
     setOpenDropdown((state) => !state);
