@@ -1,64 +1,13 @@
-import React, { useState } from "react";
-import crossIcon from "../assets/icon-cross.svg";
-import boardsSlice from "../redux/boardsSlice";
-import { v4 as uuidv4 } from "uuid";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useContext, useState } from "react";
 import axios from "axios";
-import { login } from "../redux/authSlice";
+import AuthContext from '../context/AuthContext'
 
-function SigninModel({ setIsSigninModalOpen, type , }) {
-  const dispatch = useDispatch();
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const [name, setName] = useState("");
+function SigninModel({ setIsSigninModalOpen, type }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const [newColumns, setNewColumns] = useState([
-    { name: "Todo", tasks: [], id: uuidv4() },
-    { name: "Doing", tasks: [], id: uuidv4() },
-  ]);
-  const [isValid, setIsValid] = useState(true);
-  const board = useSelector((state) => state.boards).find(
-    (board) => board.isActive
-  );
-
-  if (type === "edit" && isFirstLoad) {
-    setNewColumns(
-      board.columns.map((col) => {
-        return { ...col, id: uuidv4() };
-      })
-    );
-    setName(board.name);
-    setIsFirstLoad(false);
-  }
-
-  const validate = () => {
-    setIsValid(false);
-    if (!name.trim()) {
-      return false;
-    }
-    for (let i = 0 ; i < newColumns.length ; i++) {
-      if (!newColumns[i].name.trim()) {
-        return false;
-      }
-    }
-    setIsValid(true);
-    return true;
-  };
-
-  const onChange = (id, newValue) => {
-    setNewColumns((prevState) => {
-      const newState = [...prevState];
-      const column = newState.find((col) => col.id === id);
-      column.name = newValue;
-      return newState;
-    });
-  };
-
-  const onDelete = (id) => {
-    setNewColumns((prevState) => prevState.filter((el) => el.id !== id));
-  };
+  const [formType, setFormType] = useState(type);
+  const {loginUser, user} = useContext(AuthContext);
 
   const Register = async () => {
     if (type === "Signin") {
@@ -72,20 +21,14 @@ function SigninModel({ setIsSigninModalOpen, type , }) {
         username: username,
         password: password
       }
-      dispatch(login(data));
+      loginUser(data);
     }
     setIsSigninModalOpen(false);
   }
 
-  const onSubmit = (type) => {
-    Register()
-    // setIsSigninModalOpen(false);
-    // if (type === "add") {
-    //   dispatch(boardsSlice.actions.addBoard({ name, newColumns }));
-    // } else {
-    //   dispatch(boardsSlice.actions.editBoard({ name, newColumns }));
-    // }
-  };
+  const changeFormType = () => {
+    setFormType("Register");
+  }
 
   return (
     <div
@@ -102,7 +45,7 @@ function SigninModel({ setIsSigninModalOpen, type , }) {
        shadow-md shadow-[#364e7e1a] max-w-md mx-auto my-auto w-full px-8  py-8 rounded-xl"
       >
         <h3 className=" text-lg ">
-          {type === "Signin" ? "Signin" : "Login"}
+          {formType === "Register" ? "Register" : "Login"}
         </h3>
 
         {/* Task Name */}
@@ -119,7 +62,7 @@ function SigninModel({ setIsSigninModalOpen, type , }) {
           />
         </div>
 
-        {type === "Signin" && 
+        {formType === "Register" && 
         <div className="mt-8 flex flex-col space-y-1">
           <label className="  text-sm dark:text-white text-gray-500">
             Email
@@ -144,21 +87,16 @@ function SigninModel({ setIsSigninModalOpen, type , }) {
           />
         </div>
 
-        {/* Board Columns */}
+        <button onClick={() => changeFormType()}>Create Account!!!</button>
 
+        {/* Board Columns */}
         <div className="mt-8 flex flex-col space-y-3">
           <div>
-            {type === "Signin" && 
-            <li onClick={() => {}}>Has Account?</li>}
             <button
               onClick={() => Register()}
-              // onClick={() => {
-              //   const isValid = validate();
-              //   if (isValid === true) onSubmit(type);
-              // }}
               className=" w-full items-center hover:opacity-70 dark:text-white dark:bg-[#635fc7] mt-8 relative  text-white bg-[#635fc7] py-2 rounded-full"
             >
-              {type === "Signin" ? "Create Account" : "Login"}
+              {formType === "Register" ? "Create Account" : "Login"}
             </button>
           </div>
         </div>
