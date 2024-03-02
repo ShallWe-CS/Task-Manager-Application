@@ -18,7 +18,7 @@ function Home() {
   }, []);
 
   const currentboard = useSelector((state) => state.boardsNew.currentBoard);
-  const columnsNew = currentboard.columns;
+  const columnsNew = currentboard?.columns;
 
   useEffect(() => {
     const handleWindowResize = () => {
