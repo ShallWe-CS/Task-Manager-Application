@@ -96,13 +96,13 @@ export const AuthProvider = ({children}) => {
             updateToken()
         }
 
-        let fourMinutes = 1000 * 60 * 4
+        let oneDay = 1000 * 60 * 60 * 24
 
         let interval =  setInterval(()=> {
             if(authTokens){
                 updateToken()
             }
-        }, fourMinutes)
+        }, oneDay)
         return ()=> clearInterval(interval)
 
     }, [authTokens, loading])

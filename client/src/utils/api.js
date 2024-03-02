@@ -1,8 +1,10 @@
 import axios from "axios";
 
+let authTokens = localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null;
+
 const params = {
     headers: {
-        Authorization: "bearer " + process.env.REACT_APP_STRIPE_APP_KEY,
+        Authorization: "Bearer " + authTokens?.access
     },
 };
 
@@ -10,7 +12,7 @@ export const fetchDataFromApi = async (url) => {
     try {
         const {data} = await axios.get(
             process.env.REACT_APP_DEV_URL + url, 
-            // params
+            params
         );
         return data;
     } catch (error) {

@@ -46,7 +46,7 @@ const boardsSliceNew = createSlice({
 });
 
 export const fetchAsyncBoards = createAsyncThunk('boards/fetch', async(limit) => {
-    const response = await fetchDataFromApi("/api/boards/");
+    const response = await fetchDataFromApi("/api/boards/boards_by_owner/");
     return response;
 });
 
