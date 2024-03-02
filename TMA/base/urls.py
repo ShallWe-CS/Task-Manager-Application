@@ -1,6 +1,6 @@
 from django.urls import path
 from .views.auth_views import MyTokenObtainPairView, UserRegistrationView
-from .views.board_views import boards_by_owner
+from .views.board_views import boards_by_owner, edit_board
 from rest_framework_simplejwt.views import ( TokenRefreshView)
 from .views.views import TaskViewSet, ColumnViewSet, BoardViewSet
 from rest_framework.routers import DefaultRouter
@@ -19,5 +19,5 @@ urlpatterns = [
     path('register/',   UserRegistrationView.as_view()),
 
     path('boards/boards_by_owner/',  boards_by_owner, name='boards_by_owner'),
-
+    path('boards/<int:board_id>/edit/', edit_board, name='edit_board'),
 ] + router.urls
