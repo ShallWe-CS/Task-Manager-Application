@@ -8,7 +8,7 @@ from rest_framework.decorators import permission_classes, api_view
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def boards_by_owner(request):
+def get_all(request):
     # Get the currently authenticated user
     owner = request.user
 
@@ -20,6 +20,23 @@ def boards_by_owner(request):
 
     # Return the serialized data as a response
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_board(request):
+    # Set the owner of the board to the currently authenticated user
+    request.data['owner'] = request.user.id
+
+    # Deserialize the request data using the BoardSerializer
+    serializer = BoardSerializer(data=request.data)
+
+    # Validate and save the data if valid
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
@@ -42,3 +59,20 @@ def edit_board(request, board_id):
         return Response(serializer.data)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_board(request, board_id):
+    # Get the board instance based on the provided board_id
+    board = get_object_or_404(Board, id=board_id)
+
+    # Check if the user making the request is the owner of the board
+    if request.user != board.owner:
+        return Response({"detail": "You do not have permission to delete this board."},
+                        status=status.HTTP_403_FORBIDDEN)
+
+    # Delete the board
+    board.delete()
+
+    return Response({"detail": "Board deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
