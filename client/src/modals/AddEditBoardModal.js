@@ -3,6 +3,8 @@ import crossIcon from "../assets/icon-cross.svg";
 import boardsSlice from "../redux/boardsSlice";
 import { v4 as uuidv4 } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
+import { putDataWithAuthentication } from "../utils/api";
+import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
 function AddEditBoardModal({ setIsBoardModalOpen, type , }) {
   const dispatch = useDispatch();
@@ -16,14 +18,18 @@ function AddEditBoardModal({ setIsBoardModalOpen, type , }) {
   const board = useSelector((state) => state.boards).find(
     (board) => board.isActive
   );
+  const currentBoard = useSelector((state) => state.boardsNew.currentBoard);
+
+  console.log('currentboard: ', currentBoard)
 
   if (type === "edit" && isFirstLoad) {
     setNewColumns(
-      board.columns.map((col) => {
-        return { ...col, id: uuidv4() };
+      currentBoard.columns.map((col) => {
+        return { ...col, id: col.id };
       })
     );
-    setName(board.name);
+    // setName(board.name);
+    setName(currentBoard.name);
     setIsFirstLoad(false);
   }
 
@@ -59,7 +65,11 @@ function AddEditBoardModal({ setIsBoardModalOpen, type , }) {
     if (type === "add") {
       dispatch(boardsSlice.actions.addBoard({ name, newColumns }));
     } else {
-      dispatch(boardsSlice.actions.editBoard({ name, newColumns }));
+      let data = {
+        name : name,
+        columns : newColumns
+      }
+      putDataWithAuthentication(`/api/boards/${currentBoard.id}/edit/`, data)
     }
   };
 
