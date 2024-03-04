@@ -1,6 +1,6 @@
 from rest_framework import status
-from ..serializers import BoardSerializer
-from ..models import Board
+from ..serializers import BoardSerializer, ColumnSerializer
+from ..models import Board, Column
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -56,6 +56,22 @@ def edit_board(request, board_id):
     # Validate and save the data if valid
     if serializer.is_valid():
         serializer.save()
+
+        # Handle column data separately
+        columns_data = request.data.get('columns', [])
+        for column_data in columns_data:
+            column_id = column_data.get('id', None)
+            if column_id:
+                # Get the column instance based on the provided column_id
+                column = get_object_or_404(Column, id=column_id)
+
+                # Update the column data using ColumnSerializer
+                column_serializer = ColumnSerializer(column, data=column_data, partial=True)
+                if column_serializer.is_valid():
+                    column_serializer.save()
+                else:
+                    return Response(column_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         return Response(serializer.data)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

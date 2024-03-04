@@ -11,14 +11,14 @@ class ColumnSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Column
-        fields = ['name', 'board', 'tasks']
+        fields = ['id', 'name', 'board', 'tasks']
 
 class BoardSerializer(serializers.ModelSerializer):
     columns = ColumnSerializer(many=True, read_only=True, source='column_set')  # Use source to access related name
 
     class Meta:
         model = Board
-        fields = ['name', 'owner', 'columns']
+        fields = ['id', 'name', 'owner', 'columns']
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
