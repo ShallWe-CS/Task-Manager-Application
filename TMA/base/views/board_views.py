@@ -67,10 +67,14 @@ def edit_board(request, board_id):
 
                 # Update the column data using ColumnSerializer
                 column_serializer = ColumnSerializer(column, data=column_data, partial=True)
-                if column_serializer.is_valid():
-                    column_serializer.save()
-                else:
-                    return Response(column_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                # If column_id is None, it's a new column, create a new instance
+                column_serializer = ColumnSerializer(data=column_data)
+
+            if column_serializer.is_valid():
+                column_serializer.save()
+            else:
+                return Response(column_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.data)
     else:
