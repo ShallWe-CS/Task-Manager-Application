@@ -21,6 +21,7 @@ function AddEditBoardModal({ setIsBoardModalOpen, type , }) {
   const currentBoard = useSelector((state) => state.boardsNew.currentBoard);
 
   console.log('currentboard: ', currentBoard)
+  console.log('newColumns: ', newColumns)
 
   if (type === "edit" && isFirstLoad) {
     setNewColumns(
@@ -138,7 +139,7 @@ function AddEditBoardModal({ setIsBoardModalOpen, type , }) {
               onClick={() => {
                 setNewColumns((state) => [
                   ...state,
-                  { name: "", tasks: [], id: uuidv4() },
+                  { name: "", tasks: [], id: null, board: currentBoard.id },
                 ]);
               }}
             >
