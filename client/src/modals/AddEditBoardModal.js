@@ -14,14 +14,12 @@ function AddEditBoardModal({ setIsBoardModalOpen, type , }) {
     { name: "Todo", tasks: [], id: uuidv4() },
     { name: "Doing", tasks: [], id: uuidv4() },
   ]);
+  const [deleteColumns, setDeleteColumns] = useState([]);
   const [isValid, setIsValid] = useState(true);
   const board = useSelector((state) => state.boards).find(
     (board) => board.isActive
   );
   const currentBoard = useSelector((state) => state.boardsNew.currentBoard);
-
-  console.log('currentboard: ', currentBoard)
-  console.log('newColumns: ', newColumns)
 
   if (type === "edit" && isFirstLoad) {
     setNewColumns(
@@ -57,8 +55,18 @@ function AddEditBoardModal({ setIsBoardModalOpen, type , }) {
     });
   };
 
-  const onDelete = (id) => {
-    setNewColumns((prevState) => prevState.filter((el) => el.id !== id));
+  // const onDelete = (id) => {
+  //   setNewColumns((prevState) => prevState.filter((el) => el.id !== id));
+  // };
+
+  const onDelete = (column) => {
+    // Add the deleted column to the deleteColumns state
+    setDeleteColumns((prevDeleteColumns) => [...prevDeleteColumns, column]);
+
+    // Remove the deleted column from the newColumns state
+    setNewColumns((prevNewColumns) =>
+      prevNewColumns.filter((col) => col.id !== column.id)
+    );  
   };
 
   const onSubmit = (type) => {
@@ -68,7 +76,8 @@ function AddEditBoardModal({ setIsBoardModalOpen, type , }) {
     } else {
       let data = {
         name : name,
-        columns : newColumns
+        columns : newColumns,
+        deleteColumns: deleteColumns
       }
       putDataWithAuthentication(`/api/boards/${currentBoard.id}/edit/`, data)
     }
@@ -127,7 +136,7 @@ function AddEditBoardModal({ setIsBoardModalOpen, type , }) {
               <img
                 src={crossIcon}
                 onClick={() => {
-                  onDelete(column.id);
+                  onDelete(column);
                 }}
                 className=" m-4 cursor-pointer "
               />
