@@ -59,6 +59,15 @@ def edit_board(request, board_id):
 
         # Handle column data separately
         columns_data = request.data.get('columns', [])
+        columns_to_delete = request.data.get('deleteColumns', [])
+
+        # Delete columns based on the provided column IDs
+        for column_to_delete in columns_to_delete:
+            column_id = column_to_delete.get('id', None)
+            column = get_object_or_404(Column, id=column_id)
+            column.delete()
+
+        # Update or create columns
         for column_data in columns_data:
             column_id = column_data.get('id', None)
             if column_id:
@@ -67,10 +76,14 @@ def edit_board(request, board_id):
 
                 # Update the column data using ColumnSerializer
                 column_serializer = ColumnSerializer(column, data=column_data, partial=True)
-                if column_serializer.is_valid():
-                    column_serializer.save()
-                else:
-                    return Response(column_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                # If column_id is None, it's a new column, create a new instance
+                column_serializer = ColumnSerializer(data=column_data)
+
+            if column_serializer.is_valid():
+                column_serializer.save()
+            else:
+                return Response(column_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.data)
     else:
