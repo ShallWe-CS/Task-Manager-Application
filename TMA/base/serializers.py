@@ -4,7 +4,7 @@ from .models import Task, Board, Column, CustomUser
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'status', 'user']
+        fields = ['title', 'description', 'status', 'created_by', 'assigned_to', 'board', 'column']
 
 class ColumnSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True, read_only=True, source='task_set')  # Use source to access related name
