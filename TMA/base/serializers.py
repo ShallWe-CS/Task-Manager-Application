@@ -1,10 +1,17 @@
 from rest_framework import serializers
-from .models import Task, Board, Column, CustomUser
+from .models import Task, Board, Column, CustomUser, SubTask
+
+class SubTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubTask
+        fields = ['id', 'title', 'is_completed', 'task', 'created_by']
 
 class TaskSerializer(serializers.ModelSerializer):
+    subtasks = SubTaskSerializer(many=True, read_only=True, source='subtask_set')  # Use source to access related name
+
     class Meta:
         model = Task
-        fields = ['title', 'description', 'status', 'user']
+        fields = ['id', 'title', 'description', 'status', 'created_by', 'assigned_to', 'board', 'column', 'subtasks']
 
 class ColumnSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True, read_only=True, source='task_set')  # Use source to access related name
