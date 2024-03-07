@@ -30,3 +30,9 @@ class Task(models.Model):
     assigned_to = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='tasks_assigned', null=True, blank=True)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, default=1)
     column = models.ForeignKey(Column, on_delete=models.CASCADE, default=1)
+
+class SubTask(models.Model):
+    title = models.CharField(max_length=255)
+    is_completed = models.BooleanField()
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='subtask_set') # The default related name for reverse relationships in Django is the lowercase name of the related model followed by "_set"
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='subtask_created_by')

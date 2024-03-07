@@ -25,6 +25,8 @@ function Task({ colIndex, taskIndex, taskDetails }) {
     );
   };
 
+  console.log('taskDetails: ', taskDetails)
+
   return (
     <div>
       <div
@@ -44,6 +46,7 @@ function Task({ colIndex, taskIndex, taskDetails }) {
         <TaskModal
           colIndex={colIndex}
           taskIndex={taskIndex}
+          taskDetails={taskDetails}
           setIsTaskModalOpen={setIsTaskModalOpen}
         />
       )}

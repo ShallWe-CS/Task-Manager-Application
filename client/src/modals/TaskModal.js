@@ -7,7 +7,7 @@ import Subtask from "../components/Subtask";
 import AddEditTaskModal from "./AddEditTaskModal";
 import DeleteModal from "./DeleteModal";
 
-function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen }) {
+function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
   const dispatch = useDispatch();
   const [isElipsisMenuOpen, setIsElipsisMenuOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -78,7 +78,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen }) {
 
       <div className=" scrollbar-hide overflow-y-scroll max-h-[95vh]  my-auto  bg-white dark:bg-[#2b2c37] text-black dark:text-white font-bold shadow-md shadow-[#364e7e1a] max-w-md mx-auto  w-full px-8  py-8 rounded-xl">
         <div className=" relative flex   justify-between w-full items-center">
-          <h1 className=" text-lg">{task.title}</h1>
+          <h1 className=" text-lg">{taskDetails.title}</h1>
 
           <img
             onClick={() => {

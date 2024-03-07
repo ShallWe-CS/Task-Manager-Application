@@ -28,6 +28,8 @@ function Column({ colIndex, columnDetails }) {
     setColor(shuffle(colors).pop())
   }, [dispatch]);
 
+  console.log('columnDetails: ', columnDetails)
+
 
 
   const handleOnDrop = (e) => {
