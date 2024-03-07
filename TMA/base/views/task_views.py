@@ -10,7 +10,7 @@ from rest_framework.decorators import permission_classes, api_view
 @permission_classes([IsAuthenticated])
 def add_task(request):
     # Set the owner of the board to the currently authenticated user
-    # request.data['created_by'] = request.user.id
+    request.data['created_by'] = request.user.id
 
     # Deserialize the request data using the TaskSerializer
     serializer = TaskSerializer(data=request.data)

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import crossIcon from "../assets/icon-cross.svg";
 import boardsSlice from "../redux/boardsSlice";
+import { postDataToApi, putDataWithAuthentication } from "../utils/api";
 
 function AddEditTaskModal({
   type,
@@ -30,6 +31,8 @@ function AddEditTaskModal({
     { title: "", isCompleted: false, id: uuidv4() },
     { title: "", isCompleted: false, id: uuidv4() },
   ]);
+
+  const currentBoard = useSelector((state) => state.boardsNew.currentBoard);
 
   const onChangeSubtasks = (id, newValue) => {
     setSubtasks((prevState) => {
@@ -75,29 +78,40 @@ function AddEditTaskModal({
   };
 
   const onSubmit = (type) => {
-    if (type === "add") {
-      dispatch(
-        boardsSlice.actions.addTask({
-          title,
-          description,
-          subtasks,
-          status,
-          newColIndex,
-        })
-      );
-    } else {
-      dispatch(
-        boardsSlice.actions.editTask({
-          title,
-          description,
-          subtasks,
-          status,
-          taskIndex,
-          prevColIndex,
-          newColIndex,
-        })
-      );
+    console.log("hjhhhhh")
+    let data = {
+      title : title,
+      description : description,
+      status: status,
+      assigned_to: null,
+      board: currentBoard.id,
+      column: currentBoard.columns[0].id,
     }
+    postDataToApi(`/api/tasks/add/`, data)
+
+    // if (type === "add") {
+    //   dispatch(
+    //     boardsSlice.actions.addTask({
+    //       title,
+    //       description,
+    //       subtasks,
+    //       status,
+    //       newColIndex,
+    //     })
+    //   );
+    // } else {
+    //   dispatch(
+    //     boardsSlice.actions.editTask({
+    //       title,
+    //       description,
+    //       subtasks,
+    //       status,
+    //       taskIndex,
+    //       prevColIndex,
+    //       newColIndex,
+    //     })
+    //   );
+    // }
   };
 
   return (
