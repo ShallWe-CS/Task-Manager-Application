@@ -6,6 +6,8 @@ import boardsSlice from "../redux/boardsSlice";
 import Subtask from "../components/Subtask";
 import AddEditTaskModal from "./AddEditTaskModal";
 import DeleteModal from "./DeleteModal";
+import { putDataWithAuthentication, deleteDataWithAuthentication } from "../utils/api";
+import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
 function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
   const dispatch = useDispatch();
@@ -16,7 +18,8 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
   const columns = board.columns;
   const col = columns.find((col, i) => i === colIndex);
   const task = col.tasks.find((task, i) => i === taskIndex);
-  const subtasks = task.subtasks;
+  let subtasks = taskDetails.subtasks;
+  let subtasksChanged = false;
 
   let completed = 0;
   subtasks.forEach((subtask) => {
@@ -25,31 +28,53 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
     }
   });
 
-  const [status, setStatus] = useState(task.status);
+  const [status, setStatus] = useState(task?.status);
   const [newColIndex, setNewColIndex] = useState(columns.indexOf(col));
   const onChange = (e) => {
     setStatus(e.target.value);
     setNewColIndex(e.target.selectedIndex);
   };
 
+  // onClose TaskModel send completed subtask call
   const onClose = (e) => {
     if (e.target !== e.currentTarget) {
       return;
+    } else {
+      if(subtasksChanged) {
+        let data = {
+          subtasks : subtasks
+        }
+        putDataWithAuthentication('/api/subtasks/edit/', data);
+        dispatch(fetchAsyncBoards());
+      }
     }
-    dispatch(
-      boardsSlice.actions.setTaskStatus({
-        taskIndex,
-        colIndex,
-        newColIndex,
-        status,
-      })
-    );
+    // dispatch(
+    //   boardsSlice.actions.setTaskStatus({
+    //     taskIndex,
+    //     colIndex,
+    //     newColIndex,
+    //     status,
+    //   })
+    // );
     setIsTaskModalOpen(false);
   };
 
+  const changeSubtaskStatus = (id) => {
+
+    const updatedSubtasks = subtasks.map((subtask) =>
+    subtask.id === id
+      ? { ...subtask, is_completed: !subtask.is_completed }
+      : subtask
+    );
+    subtasksChanged = true;
+    subtasks = updatedSubtasks;
+  }
+
   const onDeleteBtnClick = (e) => {
     if (e.target.textContent === "Delete") {
-      dispatch(boardsSlice.actions.deleteTask({ taskIndex, colIndex }));
+      deleteDataWithAuthentication(`/api/tasks/${taskDetails.id}/delete/`)
+      dispatch(fetchAsyncBoards());
+      // dispatch(boardsSlice.actions.deleteTask({ taskIndex, colIndex }));
       setIsTaskModalOpen(false);
       setIsDeleteModalOpen(false);
     } else {
@@ -97,7 +122,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
           )}
         </div>
         <p className=" text-gray-500 font-[600] tracking-wide text-xs pt-6">
-          {task.description}
+          {task?.description}
         </p>
 
         <p className=" pt-6 text-gray-500 tracking-widest text-sm">
@@ -114,6 +139,8 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
                 taskIndex={taskIndex}
                 colIndex={colIndex}
                 key={index}
+                subtask={subtask}
+                changeSubtaskStatus={changeSubtaskStatus}
               />
             );
           })}
@@ -143,6 +170,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
           onDeleteBtnClick={onDeleteBtnClick}
           type="task"
           title={task.title}
+          setIsDeleteModalOpen={setIsDeleteModalOpen}
         />
       )}
 
@@ -153,6 +181,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
           type="edit"
           taskIndex={taskIndex}
           prevColIndex={colIndex}
+          taskDetails={taskDetails}
         />
       )}
     </div>

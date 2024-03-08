@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import crossIcon from "../assets/icon-cross.svg";
 import boardsSlice from "../redux/boardsSlice";
-import { postDataToApi, putDataWithAuthentication } from "../utils/api";
+import { postDataToApi, putDataWithAuthentication, deleteDataWithAuthentication } from "../utils/api";
+import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
 function AddEditTaskModal({
   type,
@@ -12,9 +13,11 @@ function AddEditTaskModal({
   setIsAddTaskModalOpen,
   taskIndex,
   prevColIndex = 0,
+  taskDetails
 }) {
   const dispatch = useDispatch();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [deleteSubtasks, setDeleteSubtasks] = useState([]);
   const [isValid, setIsValid] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -64,21 +67,26 @@ function AddEditTaskModal({
 
   if (type === "edit" && isFirstLoad) {
     setSubtasks(
-      task.subtasks.map((subtask) => {
-        return { ...subtask, id: uuidv4() };
+      taskDetails.subtasks.map((subtask) => {
+        return { ...subtask, id: subtask.id };
       })
     );
-    setTitle(task.title);
-    setDescription(task.description);
+    setTitle(taskDetails.title);
+    setDescription(taskDetails.description);
     setIsFirstLoad(false);
   }
 
-  const onDelete = (id) => {
-    setSubtasks((prevState) => prevState.filter((el) => el.id !== id));
+  const onDelete = (subtask) => {
+    // Add the deleted subtask to the deleteSubtasks state
+    setDeleteSubtasks((prevDeleteSubtasks) => [...prevDeleteSubtasks, subtask]);
+
+    // Remove the deleted subtask from the newSubtasks state
+    setSubtasks((prevState) => 
+      prevState.filter((el) => el.id !== subtask.id)
+    );
   };
 
   const onSubmit = (type) => {
-    console.log("hjhhhhh")
     let data = {
       title : title,
       description : description,
@@ -86,8 +94,15 @@ function AddEditTaskModal({
       assigned_to: null,
       board: currentBoard.id,
       column: currentBoard.columns[0].id,
+      subtasks: subtasks,
+      deleteSubtasks: deleteSubtasks
     }
-    postDataToApi(`/api/tasks/add/`, data)
+    if(type == "edit"){
+      putDataWithAuthentication(`/api/tasks/${taskDetails.id}/edit/`, data)
+    }else{
+      postDataToApi(`/api/tasks/add/`, data)
+    }
+    dispatch(fetchAsyncBoards());
 
     // if (type === "add") {
     //   dispatch(
@@ -191,7 +206,7 @@ function AddEditTaskModal({
               <img
                 src={crossIcon}
                 onClick={() => {
-                  onDelete(subtask.id);
+                  onDelete(subtask);
                 }}
                 className=" m-4 cursor-pointer "
               />

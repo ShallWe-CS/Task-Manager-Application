@@ -50,3 +50,16 @@ export const putDataWithAuthentication = async (url, requestData) => {
         return error;
     }
 };
+
+export const deleteDataWithAuthentication = async (url) => {
+    try {
+        const { data } = await axios.delete(
+            process.env.REACT_APP_DEV_URL + url,
+            params
+        );
+        return data;
+    } catch (error) {
+        console.log(error);
+        return error;
+    }
+};
