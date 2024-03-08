@@ -6,7 +6,7 @@ import boardsSlice from "../redux/boardsSlice";
 import Subtask from "../components/Subtask";
 import AddEditTaskModal from "./AddEditTaskModal";
 import DeleteModal from "./DeleteModal";
-import { putDataWithAuthentication } from "../utils/api";
+import { putDataWithAuthentication, deleteDataWithAuthentication } from "../utils/api";
 import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
 function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
@@ -35,6 +35,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
     setNewColIndex(e.target.selectedIndex);
   };
 
+  // onClose TaskModel send completed subtask call
   const onClose = (e) => {
     if (e.target !== e.currentTarget) {
       return;
@@ -71,7 +72,9 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
 
   const onDeleteBtnClick = (e) => {
     if (e.target.textContent === "Delete") {
-      dispatch(boardsSlice.actions.deleteTask({ taskIndex, colIndex }));
+      deleteDataWithAuthentication(`/api/tasks/${taskDetails.id}/delete/`)
+      dispatch(fetchAsyncBoards());
+      // dispatch(boardsSlice.actions.deleteTask({ taskIndex, colIndex }));
       setIsTaskModalOpen(false);
       setIsDeleteModalOpen(false);
     } else {
@@ -167,6 +170,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
           onDeleteBtnClick={onDeleteBtnClick}
           type="task"
           title={task.title}
+          setIsDeleteModalOpen={setIsDeleteModalOpen}
         />
       )}
 

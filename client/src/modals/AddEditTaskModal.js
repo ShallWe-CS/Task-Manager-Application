@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import crossIcon from "../assets/icon-cross.svg";
 import boardsSlice from "../redux/boardsSlice";
-import { postDataToApi, putDataWithAuthentication } from "../utils/api";
+import { postDataToApi, putDataWithAuthentication, deleteDataWithAuthentication } from "../utils/api";
 import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
 function AddEditTaskModal({
@@ -17,6 +17,7 @@ function AddEditTaskModal({
 }) {
   const dispatch = useDispatch();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [deleteSubtasks, setDeleteSubtasks] = useState([]);
   const [isValid, setIsValid] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -75,8 +76,14 @@ function AddEditTaskModal({
     setIsFirstLoad(false);
   }
 
-  const onDelete = (id) => {
-    setSubtasks((prevState) => prevState.filter((el) => el.id !== id));
+  const onDelete = (subtask) => {
+    // Add the deleted subtask to the deleteSubtasks state
+    setDeleteSubtasks((prevDeleteSubtasks) => [...prevDeleteSubtasks, subtask]);
+
+    // Remove the deleted subtask from the newSubtasks state
+    setSubtasks((prevState) => 
+      prevState.filter((el) => el.id !== subtask.id)
+    );
   };
 
   const onSubmit = (type) => {
@@ -87,7 +94,8 @@ function AddEditTaskModal({
       assigned_to: null,
       board: currentBoard.id,
       column: currentBoard.columns[0].id,
-      subtasks: subtasks
+      subtasks: subtasks,
+      deleteSubtasks: deleteSubtasks
     }
     if(type == "edit"){
       putDataWithAuthentication(`/api/tasks/${taskDetails.id}/edit/`, data)
@@ -198,7 +206,7 @@ function AddEditTaskModal({
               <img
                 src={crossIcon}
                 onClick={() => {
-                  onDelete(subtask.id);
+                  onDelete(subtask);
                 }}
                 className=" m-4 cursor-pointer "
               />

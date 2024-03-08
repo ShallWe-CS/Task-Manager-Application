@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { putDataWithAuthentication } from "../utils/api";
 import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
-function AddEditBoardModal({ setIsBoardModalOpen, type , }) {
+function AddEditBoardModal({ setIsBoardModalOpen, type}) {
   const dispatch = useDispatch();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [name, setName] = useState("");
