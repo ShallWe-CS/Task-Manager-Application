@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import crossIcon from "../assets/icon-cross.svg";
 import boardsSlice from "../redux/boardsSlice";
 import { postDataToApi, putDataWithAuthentication } from "../utils/api";
+import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
 function AddEditTaskModal({
   type,
@@ -12,6 +13,7 @@ function AddEditTaskModal({
   setIsAddTaskModalOpen,
   taskIndex,
   prevColIndex = 0,
+  taskDetails
 }) {
   const dispatch = useDispatch();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
@@ -64,12 +66,12 @@ function AddEditTaskModal({
 
   if (type === "edit" && isFirstLoad) {
     setSubtasks(
-      task.subtasks.map((subtask) => {
-        return { ...subtask, id: uuidv4() };
+      taskDetails.subtasks.map((subtask) => {
+        return { ...subtask, id: subtask.id };
       })
     );
-    setTitle(task.title);
-    setDescription(task.description);
+    setTitle(taskDetails.title);
+    setDescription(taskDetails.description);
     setIsFirstLoad(false);
   }
 
@@ -78,7 +80,6 @@ function AddEditTaskModal({
   };
 
   const onSubmit = (type) => {
-    console.log("hjhhhhh")
     let data = {
       title : title,
       description : description,
@@ -86,8 +87,14 @@ function AddEditTaskModal({
       assigned_to: null,
       board: currentBoard.id,
       column: currentBoard.columns[0].id,
+      subtasks: subtasks
     }
-    postDataToApi(`/api/tasks/add/`, data)
+    if(type == "edit"){
+      putDataWithAuthentication(`/api/tasks/${taskDetails.id}/edit/`, data)
+    }else{
+      postDataToApi(`/api/tasks/add/`, data)
+    }
+    dispatch(fetchAsyncBoards());
 
     // if (type === "add") {
     //   dispatch(

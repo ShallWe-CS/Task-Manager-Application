@@ -1,6 +1,6 @@
 from rest_framework import status
 from ..serializers import TaskSerializer, SubTaskSerializer
-from ..models import Board, Column
+from ..models import Task
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -36,3 +36,25 @@ def add_task(request):
         return Response(task_serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response(task_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def edit_task(request, task_id):
+    # Get the task instance based on the provided task_id
+    task = get_object_or_404(Task, id=task_id)
+
+    # Check if the user making the request is the owner of the board
+    # if request.user != board.owner:
+    #     return Response({"detail": "You do not have permission to edit this board."},
+    #                     status=status.HTTP_403_FORBIDDEN)
+
+    # Deserialize the request data using the TaskSerializer
+    serializer = TaskSerializer(task, data=request.data, partial=True)
+
+    # Validate and save the data if valid
+    if serializer.is_valid():
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

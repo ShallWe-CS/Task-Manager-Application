@@ -28,7 +28,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
     }
   });
 
-  const [status, setStatus] = useState(task.status);
+  const [status, setStatus] = useState(task?.status);
   const [newColIndex, setNewColIndex] = useState(columns.indexOf(col));
   const onChange = (e) => {
     setStatus(e.target.value);
@@ -119,7 +119,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
           )}
         </div>
         <p className=" text-gray-500 font-[600] tracking-wide text-xs pt-6">
-          {task.description}
+          {task?.description}
         </p>
 
         <p className=" pt-6 text-gray-500 tracking-widest text-sm">
@@ -177,6 +177,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
           type="edit"
           taskIndex={taskIndex}
           prevColIndex={colIndex}
+          taskDetails={taskDetails}
         />
       )}
     </div>

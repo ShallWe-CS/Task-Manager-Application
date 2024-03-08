@@ -1,7 +1,7 @@
 from django.urls import path
 from .views.auth_views import MyTokenObtainPairView, UserRegistrationView
 from .views.board_views import get_all, edit_board, delete_board, add_board
-from .views.task_views import add_task
+from .views.task_views import add_task, edit_task
 from .views.subtask_views import add_subtask, edit_subtask
 from rest_framework_simplejwt.views import ( TokenRefreshView)
 from .views.views import TaskViewSet, ColumnViewSet, BoardViewSet
@@ -26,6 +26,7 @@ urlpatterns = [
     path('boards/<int:board_id>/delete/', delete_board, name='delete_board'),
 
     path('tasks/add/', add_task, name='add_task'),
+    path('tasks/<int:task_id>/edit/', edit_task, name='edit_task'),
 
     path('subtasks/add/', add_subtask, name='add_subtask'),
     path('subtasks/edit/', edit_subtask, name='edit_subtask'),
