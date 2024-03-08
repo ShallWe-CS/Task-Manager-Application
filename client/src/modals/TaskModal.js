@@ -6,6 +6,8 @@ import boardsSlice from "../redux/boardsSlice";
 import Subtask from "../components/Subtask";
 import AddEditTaskModal from "./AddEditTaskModal";
 import DeleteModal from "./DeleteModal";
+import { putDataWithAuthentication } from "../utils/api";
+import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
 function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
   const dispatch = useDispatch();
@@ -16,7 +18,8 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
   const columns = board.columns;
   const col = columns.find((col, i) => i === colIndex);
   const task = col.tasks.find((task, i) => i === taskIndex);
-  const subtasks = task.subtasks;
+  let subtasks = taskDetails.subtasks;
+  let subtasksChanged = false;
 
   let completed = 0;
   subtasks.forEach((subtask) => {
@@ -35,17 +38,36 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
   const onClose = (e) => {
     if (e.target !== e.currentTarget) {
       return;
+    } else {
+      if(subtasksChanged) {
+        let data = {
+          subtasks : subtasks
+        }
+        putDataWithAuthentication('/api/subtasks/edit/', data);
+        dispatch(fetchAsyncBoards());
+      }
     }
-    dispatch(
-      boardsSlice.actions.setTaskStatus({
-        taskIndex,
-        colIndex,
-        newColIndex,
-        status,
-      })
-    );
+    // dispatch(
+    //   boardsSlice.actions.setTaskStatus({
+    //     taskIndex,
+    //     colIndex,
+    //     newColIndex,
+    //     status,
+    //   })
+    // );
     setIsTaskModalOpen(false);
   };
+
+  const changeSubtaskStatus = (id) => {
+
+    const updatedSubtasks = subtasks.map((subtask) =>
+    subtask.id === id
+      ? { ...subtask, is_completed: !subtask.is_completed }
+      : subtask
+    );
+    subtasksChanged = true;
+    subtasks = updatedSubtasks;
+  }
 
   const onDeleteBtnClick = (e) => {
     if (e.target.textContent === "Delete") {
@@ -114,6 +136,8 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
                 taskIndex={taskIndex}
                 colIndex={colIndex}
                 key={index}
+                subtask={subtask}
+                changeSubtaskStatus={changeSubtaskStatus}
               />
             );
           })}

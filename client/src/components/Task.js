@@ -11,8 +11,8 @@ function Task({ colIndex, taskIndex, taskDetails }) {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
   let completed = 0;
-  let subtasks = task.subtasks;
-  subtasks.forEach((subtask) => {
+  let subtasks = task?.subtasks;
+  subtasks?.forEach((subtask) => {
     if (subtask.isCompleted) {
       completed++;
     }
@@ -24,8 +24,6 @@ function Task({ colIndex, taskIndex, taskDetails }) {
       JSON.stringify({ taskIndex, prevColIndex: colIndex })
     );
   };
-
-  console.log('taskDetails: ', taskDetails)
 
   return (
     <div>
@@ -39,7 +37,7 @@ function Task({ colIndex, taskIndex, taskDetails }) {
       >
         <p className=" font-bold tracking-wide ">{taskDetails.title}</p>
         <p className=" font-bold text-xs tracking-tighter mt-2 text-gray-500">
-          {completed} of {subtasks.length} completed tasks
+          {completed} of {subtasks?.length} completed tasks
         </p>
       </div>
       {isTaskModalOpen && (
