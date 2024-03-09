@@ -11,9 +11,9 @@ function Task({ colIndex, taskIndex, taskDetails }) {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
   let completed = 0;
-  let subtasks = task?.subtasks;
+  let subtasks = taskDetails?.subtasks;
   subtasks?.forEach((subtask) => {
-    if (subtask.isCompleted) {
+    if (subtask.is_completed) {
       completed++;
     }
   });

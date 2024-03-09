@@ -11,7 +11,7 @@ from rest_framework.decorators import permission_classes, api_view
 def add_task(request):
     # Set the owner of the board to the currently authenticated user
     request.data['created_by'] = request.user.id
-    subtasks = request.data['subtasks']
+    subtasks = request.data['newSubtasks']
 
     # Deserialize the request data using the TaskSerializer
     task_serializer = TaskSerializer(data=request.data)
@@ -57,7 +57,18 @@ def edit_task(request, task_id):
 
         # Handle subtasks data separately
         subtasks = request.data['subtasks']
+        new_subtasks = request.data['newSubtasks']
         subtasks_to_delete = request.data['deleteSubtasks']
+
+        # Add new subtasks
+        for new_subtask in new_subtasks:
+            new_subtask.pop('id', None)  # Remove the 'id' key if it exists
+            new_subtask['created_by'] = request.user.id
+            subtask_serializer = SubTaskSerializer(data=new_subtask)
+            if subtask_serializer.is_valid():
+                subtask_serializer.save()
+            else:
+                return Response(subtask_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # Delete columns based on the provided column IDs
         for subtask_to_delete in subtasks_to_delete:

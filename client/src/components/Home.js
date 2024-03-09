@@ -13,9 +13,15 @@ function Home() {
   ]);
   const dispatch = useDispatch();
 
+  const boardsNew = useSelector((state) => state.boardsNew.boards);
+
    useEffect(() => {
     dispatch(fetchAsyncBoards());
   }, []);
+
+  useEffect(() => {
+    console.log('board Slice changed')
+  }, [boardsNew])
 
   const currentboard = useSelector((state) => state.boardsNew.currentBoard);
   const columnsNew = currentboard?.columns;

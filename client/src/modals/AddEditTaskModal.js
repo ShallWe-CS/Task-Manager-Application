@@ -18,6 +18,7 @@ function AddEditTaskModal({
   const dispatch = useDispatch();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [deleteSubtasks, setDeleteSubtasks] = useState([]);
+  const [newSubtasks, setNewSubtasks] = useState([]);
   const [isValid, setIsValid] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -31,20 +32,38 @@ function AddEditTaskModal({
   const [status, setStatus] = useState(columns[prevColIndex].name);
   const [newColIndex, setNewColIndex] = useState(prevColIndex);
   const [subtasks, setSubtasks] = useState([
-    { title: "", isCompleted: false, id: uuidv4() },
-    { title: "", isCompleted: false, id: uuidv4() },
+    // { title: "", isCompleted: false, id: uuidv4() },
+    // { title: "", isCompleted: false, id: uuidv4() },
+    // ...newSubtasks
   ]);
 
+  const combinedSubtasks = [...subtasks, ...newSubtasks];
   const currentBoard = useSelector((state) => state.boardsNew.currentBoard);
 
   const onChangeSubtasks = (id, newValue) => {
-    setSubtasks((prevState) => {
-      const newState = [...prevState];
-      const subtask = newState.find((subtask) => subtask.id === id);
-      subtask.title = newValue;
-      return newState;
-    });
+    // Check if subtask.id is included in any subtask object within subtasks
+    const oldSubtask = subtasks.some((el) => el.id === id);
+
+    if(oldSubtask) {
+      setSubtasks((prevState) => {
+        const newState = [...prevState];
+        const subtask = newState.find((subtask) => subtask.id === id);
+        subtask.title = newValue;
+        return newState;
+      });
+    } else{
+      setNewSubtasks((prevState) => {
+        const newState = [...prevState];
+        const subtask = newState.find((subtask) => subtask.id === id);
+        subtask.title = newValue;
+        return newState;
+      });
+    }
   };
+
+  // console.log('newSubtasks: ', newSubtasks)
+  // console.log('deleteSubtasks: ', deleteSubtasks)
+  // console.log('subtasks: ', subtasks)
 
   const onChangeStatus = (e) => {
     setStatus(e.target.value);
@@ -76,12 +95,30 @@ function AddEditTaskModal({
     setIsFirstLoad(false);
   }
 
+  const addNewSubtask = () => {
+    let newSubtask = {
+      title: "", is_completed: false, id: uuidv4(), task: taskDetails?.id
+    }
+    setNewSubtasks((state) => [
+      ...state,
+      newSubtask
+    ]);
+  }
+
   const onDelete = (subtask) => {
+    // Check if subtask.id is included in any subtask object within subtasks
+    const isSubtaskIncluded = subtasks.some((el) => el.id === subtask.id);
+
     // Add the deleted subtask to the deleteSubtasks state
-    setDeleteSubtasks((prevDeleteSubtasks) => [...prevDeleteSubtasks, subtask]);
+    if(isSubtaskIncluded){
+      setDeleteSubtasks((prevDeleteSubtasks) => [...prevDeleteSubtasks, subtask]);
+      setSubtasks((prevState) => 
+        prevState.filter((el) => el.id !== subtask.id)
+      );
+    }
 
     // Remove the deleted subtask from the newSubtasks state
-    setSubtasks((prevState) => 
+    setNewSubtasks((prevState) => 
       prevState.filter((el) => el.id !== subtask.id)
     );
   };
@@ -95,7 +132,8 @@ function AddEditTaskModal({
       board: currentBoard.id,
       column: currentBoard.columns[0].id,
       subtasks: subtasks,
-      deleteSubtasks: deleteSubtasks
+      deleteSubtasks: deleteSubtasks,
+      newSubtasks: newSubtasks
     }
     if(type == "edit"){
       putDataWithAuthentication(`/api/tasks/${taskDetails.id}/edit/`, data)
@@ -192,7 +230,7 @@ function AddEditTaskModal({
             Subtasks
           </label>
 
-          {subtasks.map((subtask, index) => (
+          {combinedSubtasks.map((subtask, index) => (
             <div key={index} className=" flex items-center w-full ">
               <input
                 onChange={(e) => {
@@ -216,10 +254,7 @@ function AddEditTaskModal({
           <button
             className=" w-full items-center dark:text-[#635fc7] dark:bg-white  text-white bg-[#635fc7] py-2 rounded-full "
             onClick={() => {
-              setSubtasks((state) => [
-                ...state,
-                { title: "", isCompleted: false, id: uuidv4() },
-              ]);
+              addNewSubtask()
             }}
           >
             + Add New Subtask
