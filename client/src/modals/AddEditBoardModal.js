@@ -5,35 +5,32 @@ import { v4 as uuidv4 } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
 import { putDataWithAuthentication } from "../utils/api";
 import { fetchAsyncBoards } from "../redux/boardsSliceNew";
+import ColumnInput from "../components/ColumnInput";
 
 function AddEditBoardModal({ setIsBoardModalOpen, type}) {
   const dispatch = useDispatch();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [name, setName] = useState("");
-  const [newColumns, setNewColumns] = useState([
-    { name: "Todo", tasks: [], id: uuidv4() },
-    { name: "Doing", tasks: [], id: uuidv4() },
-  ]);
+  const [columns, setColumns] = useState([]);
+  const [newColumns, setNewColumns] = useState([]);
   const [deleteColumns, setDeleteColumns] = useState([]);
-  const [isValid, setIsValid] = useState(true);
-  const board = useSelector((state) => state.boards).find(
-    (board) => board.isActive
-  );
+
   const currentBoard = useSelector((state) => state.boardsNew.currentBoard);
 
+  const combinedColumns = [...columns, ...newColumns];
+
   if (type === "edit" && isFirstLoad) {
-    setNewColumns(
+    setColumns(
       currentBoard.columns.map((col) => {
         return { ...col, id: col.id };
       })
     );
-    // setName(board.name);
     setName(currentBoard.name);
     setIsFirstLoad(false);
   }
 
+  // validate board details before submission
   const validate = () => {
-    setIsValid(false);
     if (!name.trim()) {
       return false;
     }
@@ -42,46 +39,78 @@ function AddEditBoardModal({ setIsBoardModalOpen, type}) {
         return false;
       }
     }
-    setIsValid(true);
     return true;
   };
 
-  const onChange = (id, newValue) => {
-    setNewColumns((prevState) => {
-      const newState = [...prevState];
-      const column = newState.find((col) => col.id === id);
-      column.name = newValue;
-      return newState;
-    });
-  };
+  // handle add new column
+  const addNewColumn = () => {
+    let newColumn = {
+      name: "", tasks: [], id: uuidv4(), board: currentBoard.id
+    }
+    setNewColumns((state) => [
+      ...state,
+      newColumn
+    ]);
+  }
 
-  // const onDelete = (id) => {
-  //   setNewColumns((prevState) => prevState.filter((el) => el.id !== id));
-  // };
-
+  // handle board column delete
   const onDelete = (column) => {
-    // Add the deleted column to the deleteColumns state
-    setDeleteColumns((prevDeleteColumns) => [...prevDeleteColumns, column]);
+    // Check if column.id is included in any column object within columns
+    const isColumnIncluded = columns.some((el) => el.id === column.id);
+
+    // Add the deleted subtask to the deleteSubtasks state
+    if(isColumnIncluded){
+      setDeleteColumns((prevDeleteColumns) => [...prevDeleteColumns, column]);
+      setColumns((prevState) => 
+        prevState.filter((el) => el.id !== column.id)
+      );
+    }
 
     // Remove the deleted column from the newColumns state
-    setNewColumns((prevNewColumns) =>
-      prevNewColumns.filter((col) => col.id !== column.id)
+    setNewColumns((prevState) =>
+      prevState.filter((col) => col.id !== column.id)
     );  
   };
 
+  // handle board column change
+  const onChange = (id, newValue) => {
+    // Check if column.id is included in any column object within columns
+    const oldColumn = columns.some((el) => el.id === id);
+
+    if(oldColumn) {
+      setColumns((prevState) => {
+        const newState = [...prevState];
+        const column = newState.find((column) => column.id === id);
+        column.name = newValue;
+        return newState;
+      });
+    } else{
+      setNewColumns((prevState) => {
+        const newState = [...prevState];
+        const column = newState.find((column) => column.id === id);
+        column.name = newValue;
+        return newState;
+      });
+    }
+  };
+
+  // handle board submission
   const onSubmit = (type) => {
+    let data = {
+      name : name,
+      columns : columns,
+      deleteColumns: deleteColumns,
+      newColumns: newColumns
+    }
     setIsBoardModalOpen(false);
     if (type === "add") {
       dispatch(boardsSlice.actions.addBoard({ name, newColumns }));
     } else {
-      let data = {
-        name : name,
-        columns : newColumns,
-        deleteColumns: deleteColumns
-      }
       putDataWithAuthentication(`/api/boards/${currentBoard.id}/edit/`, data)
     }
   };
+
+  console.log('combinedColumns', combinedColumns)
 
   return (
     <div
@@ -123,7 +152,14 @@ function AddEditBoardModal({ setIsBoardModalOpen, type}) {
             Board Columns
           </label>
 
-          {newColumns.map((column, index) => (
+          {combinedColumns.map((column, index) => (
+            // <ColumnInput
+            //   key={index}
+            //   id={column.id}
+            //   value={column.name}
+            //   onChange={onChange}
+            //   onDelete={onDelete}
+            // />
             <div key={index} className=" flex items-center w-full ">
               <input
                 className=" bg-transparent flex-grow px-4 py-2 rounded-md text-sm  border-[0.5px] border-gray-600 focus:outline-[#635fc7] outline-[1px]  "
@@ -146,10 +182,7 @@ function AddEditBoardModal({ setIsBoardModalOpen, type}) {
             <button
               className=" w-full items-center hover:opacity-70 dark:text-[#635fc7] dark:bg-white  text-white bg-[#635fc7] py-2 rounded-full "
               onClick={() => {
-                setNewColumns((state) => [
-                  ...state,
-                  { name: "", tasks: [], id: null, board: currentBoard.id },
-                ]);
+                addNewColumn();
               }}
             >
               + Add New Column

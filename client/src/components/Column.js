@@ -19,7 +19,9 @@ function Column({ colIndex, columnDetails }) {
 
   const dispatch = useDispatch();
   const [color, setColor] = useState(null)
+
   const boards = useSelector((state) => state.boards);
+
   const board = boards.find((board) => board.isActive === true);
   const col = board.columns.find((col, i) => i === colIndex);
 

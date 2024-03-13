@@ -59,7 +59,18 @@ def edit_board(request, board_id):
 
         # Handle column data separately
         columns_data = request.data.get('columns', [])
+        new_columns = request.data['newColumns']
         columns_to_delete = request.data.get('deleteColumns', [])
+
+        # Add new subtasks
+        for new_column in new_columns:
+            new_column.pop('id', None)  # Remove the 'id' key if it exists
+            new_column['created_by'] = request.user.id
+            column_serializer = ColumnSerializer(data=new_column)
+            if column_serializer.is_valid():
+                column_serializer.save()
+            else:
+                return Response(column_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # Delete columns based on the provided column IDs
         for column_to_delete in columns_to_delete:

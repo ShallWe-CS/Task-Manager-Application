@@ -17,11 +17,12 @@ function AddEditTaskModal({
 }) {
   const dispatch = useDispatch();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const [deleteSubtasks, setDeleteSubtasks] = useState([]);
+  const [subtasks, setSubtasks] = useState([]);
   const [newSubtasks, setNewSubtasks] = useState([]);
-  const [isValid, setIsValid] = useState(true);
+  const [deleteSubtasks, setDeleteSubtasks] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  
   const board = useSelector((state) => state.boards).find(
     (board) => board.isActive
   );
@@ -30,16 +31,22 @@ function AddEditTaskModal({
   const col = columns.find((col, index) => index === prevColIndex);
   const task = col ? col.tasks.find((task, index) => index === taskIndex) : [];
   const [status, setStatus] = useState(columns[prevColIndex].name);
-  const [newColIndex, setNewColIndex] = useState(prevColIndex);
-  const [subtasks, setSubtasks] = useState([
-    // { title: "", isCompleted: false, id: uuidv4() },
-    // { title: "", isCompleted: false, id: uuidv4() },
-    // ...newSubtasks
-  ]);
 
   const combinedSubtasks = [...subtasks, ...newSubtasks];
   const currentBoard = useSelector((state) => state.boardsNew.currentBoard);
 
+  if (type === "edit" && isFirstLoad) {
+    setSubtasks(
+      taskDetails.subtasks.map((subtask) => {
+        return { ...subtask, id: subtask.id };
+      })
+    );
+    setTitle(taskDetails.title);
+    setDescription(taskDetails.description);
+    setIsFirstLoad(false);
+  }
+
+  // handle subTasks change
   const onChangeSubtasks = (id, newValue) => {
     // Check if subtask.id is included in any subtask object within subtasks
     const oldSubtask = subtasks.some((el) => el.id === id);
@@ -61,17 +68,12 @@ function AddEditTaskModal({
     }
   };
 
-  // console.log('newSubtasks: ', newSubtasks)
-  // console.log('deleteSubtasks: ', deleteSubtasks)
-  // console.log('subtasks: ', subtasks)
-
   const onChangeStatus = (e) => {
     setStatus(e.target.value);
-    setNewColIndex(e.target.selectedIndex);
   };
 
+  // validate details before submission
   const validate = () => {
-    setIsValid(false);
     if (!title.trim()) {
       return false;
     }
@@ -80,21 +82,10 @@ function AddEditTaskModal({
         return false;
       }
     }
-    setIsValid(true);
     return true;
   };
-
-  if (type === "edit" && isFirstLoad) {
-    setSubtasks(
-      taskDetails.subtasks.map((subtask) => {
-        return { ...subtask, id: subtask.id };
-      })
-    );
-    setTitle(taskDetails.title);
-    setDescription(taskDetails.description);
-    setIsFirstLoad(false);
-  }
-
+  
+  // handle add new subTask
   const addNewSubtask = () => {
     let newSubtask = {
       title: "", is_completed: false, id: uuidv4(), task: taskDetails?.id
@@ -105,6 +96,7 @@ function AddEditTaskModal({
     ]);
   }
 
+  // handle delete subtask
   const onDelete = (subtask) => {
     // Check if subtask.id is included in any subtask object within subtasks
     const isSubtaskIncluded = subtasks.some((el) => el.id === subtask.id);
@@ -123,6 +115,7 @@ function AddEditTaskModal({
     );
   };
 
+  // handle task submission
   const onSubmit = (type) => {
     let data = {
       title : title,
