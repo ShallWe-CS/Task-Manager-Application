@@ -61,4 +61,4 @@ python manage.py runserver
 #
 
 ### App Preview :
-
+(client/src/app_review/home.png)
