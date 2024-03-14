@@ -61,4 +61,4 @@ python manage.py runserver
 #
 
 ### App Preview :
-(client/src/app_review/home.png)
+<img width="100%" src="https://github.com/ShallWe-CS/Task-Manager-Application/blob/master/client/src/app_review/home.png">
