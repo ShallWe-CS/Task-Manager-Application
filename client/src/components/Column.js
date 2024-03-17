@@ -1,6 +1,6 @@
 import { shuffle } from "lodash";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import boardsSlice from "../redux/boardsSlice";
 import Task from "./Task";
 
@@ -17,20 +17,12 @@ function Column({ colIndex, columnDetails }) {
     "bg-sky-500",
   ];
 
-  
-
   const dispatch = useDispatch();
   const [color, setColor] = useState(null)
-  const boards = useSelector((state) => state.boards);
-  const board = boards.find((board) => board.isActive === true);
-  const col = board.columns.find((col, i) => i === colIndex);
+
   useEffect(() => {
     setColor(shuffle(colors).pop())
   }, [dispatch]);
-
-  console.log('columnDetails: ', columnDetails)
-
-
 
   const handleOnDrop = (e) => {
     const { prevColIndex, taskIndex } = JSON.parse(
@@ -56,7 +48,7 @@ function Column({ colIndex, columnDetails }) {
     >
       <p className=" font-semibold flex  items-center  gap-2 tracking-widest md:tracking-[.2em] text-[#828fa3]">
         <div className={`rounded-full w-4 h-4 ${color} `} />
-        {columnDetails.name} ({col.tasks.length})
+        {columnDetails.name} ({columnDetails.tasks.length})
       </p>
 
       {columnDetails?.tasks.map((task, index) => (

@@ -7,18 +7,17 @@ import Sidebar from "./Sidebar";
 import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
 function Home() {
-  const [windowSize, setWindowSize] = useState([
-    window.innerWidth,
-    window.innerHeight,
-  ]);
   const dispatch = useDispatch();
-
-   useEffect(() => {
-    dispatch(fetchAsyncBoards());
-  }, []);
+  const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
+  const [isSideBarOpen, setIsSideBarOpen] = useState(true);
+  const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
 
   const currentboard = useSelector((state) => state.boardsNew.currentBoard);
-  const columnsNew = currentboard?.columns;
+  const columns = currentboard?.columns;
+
+  useEffect(() => {
+    dispatch(fetchAsyncBoards());
+  }, []);
 
   useEffect(() => {
     const handleWindowResize = () => {
@@ -31,14 +30,6 @@ function Home() {
       window.removeEventListener("resize", handleWindowResize);
     };
   });
-
-  const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
-
-  const boards = useSelector((state) => state.boards);
-  const board = boards.find((board) => board.isActive === true);
-  const columns = board.columns;
-
-  const [isSideBarOpen, setIsSideBarOpen] = useState(true);
 
   return (
     <div
@@ -59,9 +50,9 @@ function Home() {
 
       {/* Columns Section */}
 
-      {columnsNew?.length > 0 ? (
+      {columns?.length > 0 ? (
         <>
-          {columnsNew.map((column, index) => (
+          {columns.map((column, index) => (
             <Column key={index} colIndex={index} columnDetails={column} />
           ))}
           {<div
