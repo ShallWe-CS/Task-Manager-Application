@@ -1,5 +1,5 @@
 import { API, handleApiError } from "./utils";
-import { putDataWithAuthentication, postDataToApi } from "../../utils/api";
+import { deleteDataWithAuthentication, postDataToApi } from "../../utils/api";
 import { fetchAsyncBoards } from "../../redux/boardsSliceNew";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -21,9 +21,9 @@ export const addBoard = async(data) => {
   }
 }
 
-export const deleteBoard = async(data) => {
+export const deleteBoard = async(params) => {
   try {
-    const result = postDataToApi('/api/boards/add/', data);
+    const result = deleteDataWithAuthentication(`/api/boards/${params}/delete`);
     return result;
   } catch (error) {
     return handleApiError(error);

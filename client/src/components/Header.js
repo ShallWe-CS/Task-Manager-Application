@@ -13,6 +13,8 @@ import DeleteModal from "../modals/DeleteModal";
 import boardsSlice from "../redux/boardsSlice";
 import SigninModel from "../modals/SigninModel";
 import AuthContext from '../context/AuthContext'
+import * as boardAPI from "../redux/api/boardAPI"
+import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 
 function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
   const [openDropdown, setOpenDropdown] = useState(false);
@@ -46,8 +48,7 @@ function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
 
   const onDeleteBtnClick = (e) => {
     if (e.target.textContent === "Delete") {
-      dispatch(boardsSlice.actions.deleteBoard());
-      dispatch(boardsSlice.actions.setBoardActive({ index: 0 }));
+      boardAPI.deleteBoard(currentBoard.id).then(() => dispatch(fetchAsyncBoards()));
       setIsDeleteModalOpen(false);
     } else {
       setIsDeleteModalOpen(false);
