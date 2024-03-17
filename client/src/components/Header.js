@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import Logo from "../assets/logo-mobile.svg";
+import Taski from "../assets/taski.svg";
 import iconDown from "../assets/icon-chevron-down.svg";
 import iconUp from "../assets/icon-chevron-up.svg";
 import elipsis from "../assets/icon-vertical-ellipsis.svg";
@@ -58,7 +59,7 @@ function Header({ setIsBoardModalOpen, isBoardModalOpen }) {
       <header className=" flex justify-between dark:text-white items-center  ">
         {/* Left Side  */}
         <div className=" flex items-center space-x-2  md:space-x-4">
-          <img src={Logo} alt=" Logo " className=" h-6 w-6" />
+          <img src={Taski} alt=" Logo " className=" h-12 w-12" />
           <h3 className=" md:text-4xl  hidden md:inline-block font-bold  font-sans">
             GoViral
           </h3>

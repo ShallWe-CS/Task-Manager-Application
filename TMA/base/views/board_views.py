@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from rest_framework import status
 from ..serializers import BoardSerializer, ColumnSerializer
 from ..models import Board, Column
@@ -62,44 +63,50 @@ def edit_board(request, board_id):
         new_columns = request.data['newColumns']
         columns_to_delete = request.data.get('deleteColumns', [])
 
-        # Add new subtasks
-        for new_column in new_columns:
-            new_column.pop('id', None)  # Remove the 'id' key if it exists
-            new_column['created_by'] = request.user.id
-            column_serializer = ColumnSerializer(data=new_column)
-            if column_serializer.is_valid():
-                column_serializer.save()
-            else:
-                return Response(column_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
         # Delete columns based on the provided column IDs
-        for column_to_delete in columns_to_delete:
-            column_id = column_to_delete.get('id', None)
-            column = get_object_or_404(Column, id=column_id)
-            column.delete()
-
-        # Update or create columns
-        for column_data in columns_data:
-            column_id = column_data.get('id', None)
-            if column_id:
-                # Get the column instance based on the provided column_id
-                column = get_object_or_404(Column, id=column_id)
-
-                # Update the column data using ColumnSerializer
-                column_serializer = ColumnSerializer(column, data=column_data, partial=True)
-            else:
-                # If column_id is None, it's a new column, create a new instance
-                column_serializer = ColumnSerializer(data=column_data)
-
-            if column_serializer.is_valid():
-                column_serializer.save()
-            else:
-                return Response(column_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        delete_columns(columns_to_delete)
+        update_or_create_columns(columns_data)
+        create_new_columns(new_columns, request.user)
 
         return Response(serializer.data)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+def create_new_columns(new_columns, user):
+    for new_column in new_columns:
+        new_column.pop('id', None)  # Remove the 'id' key if it exists
+        new_column['created_by'] = user.id
+        column_serializer = ColumnSerializer(data=new_column)
+        if column_serializer.is_valid():
+            column_serializer.save()
+        else:
+            raise ValidationError(column_serializer.errors)
+
+
+def delete_columns(columns_to_delete):
+    if columns_to_delete:
+        column_ids = [column['id'] for column in columns_to_delete]
+        Column.objects.filter(id__in=column_ids).delete()
+
+
+def update_or_create_columns(columns_data):
+    columns_to_update = []
+    for column_data in columns_data:
+        column_id = column_data.get('id')
+        if column_id:
+            # Get the column instance based on the provided column_id
+            column = get_object_or_404(Column, id=column_id)
+            column_serializer = ColumnSerializer(column, data=column_data, partial=True)
+        else:
+            # If column_id is None, it's a new column, create a new instance
+            column_serializer = ColumnSerializer(data=column_data)
+
+        if column_serializer.is_valid():
+            column_serializer.save()
+        else:
+            raise ValidationError(column_serializer.errors)
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])

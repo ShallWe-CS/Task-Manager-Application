@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import crossIcon from "../assets/icon-cross.svg";
-import boardsSlice from "../redux/boardsSlice";
 import { v4 as uuidv4 } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
-import { putDataWithAuthentication } from "../utils/api";
-import { fetchAsyncBoards } from "../redux/boardsSliceNew";
-import ColumnInput from "../components/ColumnInput";
+import { putDataWithAuthentication, postDataToApi } from "../utils/api";
 
-function AddEditBoardModal({ setIsBoardModalOpen, type}) {
+function AddEditBoardModal({ setIsBoardModalOpen, type }) {
   const dispatch = useDispatch();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [name, setName] = useState("");
@@ -34,7 +31,7 @@ function AddEditBoardModal({ setIsBoardModalOpen, type}) {
     if (!name.trim()) {
       return false;
     }
-    for (let i = 0 ; i < newColumns.length ; i++) {
+    for (let i = 0; i < newColumns.length; i++) {
       if (!newColumns[i].name.trim()) {
         return false;
       }
@@ -45,13 +42,13 @@ function AddEditBoardModal({ setIsBoardModalOpen, type}) {
   // handle add new column
   const addNewColumn = () => {
     let newColumn = {
-      name: "", tasks: [], id: uuidv4(), board: currentBoard.id
-    }
-    setNewColumns((state) => [
-      ...state,
-      newColumn
-    ]);
-  }
+      name: "",
+      tasks: [],
+      id: uuidv4(),
+      board: currentBoard.id,
+    };
+    setNewColumns((state) => [...state, newColumn]);
+  };
 
   // handle board column delete
   const onDelete = (column) => {
@@ -59,17 +56,15 @@ function AddEditBoardModal({ setIsBoardModalOpen, type}) {
     const isColumnIncluded = columns.some((el) => el.id === column.id);
 
     // Add the deleted subtask to the deleteSubtasks state
-    if(isColumnIncluded){
+    if (isColumnIncluded) {
       setDeleteColumns((prevDeleteColumns) => [...prevDeleteColumns, column]);
-      setColumns((prevState) => 
-        prevState.filter((el) => el.id !== column.id)
-      );
+      setColumns((prevState) => prevState.filter((el) => el.id !== column.id));
     }
 
     // Remove the deleted column from the newColumns state
     setNewColumns((prevState) =>
       prevState.filter((col) => col.id !== column.id)
-    );  
+    );
   };
 
   // handle board column change
@@ -77,14 +72,14 @@ function AddEditBoardModal({ setIsBoardModalOpen, type}) {
     // Check if column.id is included in any column object within columns
     const oldColumn = columns.some((el) => el.id === id);
 
-    if(oldColumn) {
+    if (oldColumn) {
       setColumns((prevState) => {
         const newState = [...prevState];
         const column = newState.find((column) => column.id === id);
         column.name = newValue;
         return newState;
       });
-    } else{
+    } else {
       setNewColumns((prevState) => {
         const newState = [...prevState];
         const column = newState.find((column) => column.id === id);
@@ -97,20 +92,19 @@ function AddEditBoardModal({ setIsBoardModalOpen, type}) {
   // handle board submission
   const onSubmit = (type) => {
     let data = {
-      name : name,
-      columns : columns,
+      name: name,
+      columns: columns,
       deleteColumns: deleteColumns,
-      newColumns: newColumns
-    }
+      newColumns: newColumns,
+    };
     setIsBoardModalOpen(false);
     if (type === "add") {
-      dispatch(boardsSlice.actions.addBoard({ name, newColumns }));
+      // dispatch(boardsSlice.actions.addBoard({ name, newColumns }));
+      postDataToApi(`/api/boards/add/`, data);
     } else {
-      putDataWithAuthentication(`/api/boards/${currentBoard.id}/edit/`, data)
+      putDataWithAuthentication(`/api/boards/${currentBoard.id}/edit/`, data);
     }
   };
-
-  console.log('combinedColumns', combinedColumns)
 
   return (
     <div
@@ -168,7 +162,7 @@ function AddEditBoardModal({ setIsBoardModalOpen, type}) {
                 }}
                 type="text"
                 value={column.name}
-              />
+            />
               <img
                 src={crossIcon}
                 onClick={() => {
