@@ -3,6 +3,8 @@ import crossIcon from "../assets/icon-cross.svg";
 import { v4 as uuidv4 } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
 import { putDataWithAuthentication, postDataToApi } from "../utils/api";
+import { fetchAsyncBoards } from "../redux/boardsSliceNew";
+import * as boardAPI from "../redux/api/boardAPI"
 
 function AddEditBoardModal({ setIsBoardModalOpen, type }) {
   const dispatch = useDispatch();
@@ -99,8 +101,7 @@ function AddEditBoardModal({ setIsBoardModalOpen, type }) {
     };
     setIsBoardModalOpen(false);
     if (type === "add") {
-      // dispatch(boardsSlice.actions.addBoard({ name, newColumns }));
-      postDataToApi(`/api/boards/add/`, data);
+      boardAPI.addBoard(data).then(() => dispatch(fetchAsyncBoards()));
     } else {
       putDataWithAuthentication(`/api/boards/${currentBoard.id}/edit/`, data);
     }

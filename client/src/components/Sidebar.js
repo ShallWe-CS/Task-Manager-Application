@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Switch } from "@headlessui/react";
 import boardIcon from "../assets/icon-board.svg";
@@ -7,7 +7,7 @@ import darkIcon from "../assets/icon-dark-theme.svg";
 import lightIcon from "../assets/icon-light-theme.svg";
 import showSidebarIcon from "../assets/icon-show-sidebar.svg";
 import hideSidebarIcon from "../assets/icon-hide-sidebar.svg";
-import boardsSliceNew from "../redux/boardsSliceNew";
+import boardsSliceNew, { getAllBoards } from "../redux/boardsSliceNew";
 import AddEditBoardModal from "../modals/AddEditBoardModal";
 
 function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
@@ -29,6 +29,8 @@ function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
   const toggleSidebar = () => {
     setIsSideBarOpen((curr) => !curr);
   };
+
+  console.log('boards: ', boards)
 
   return (
     <div>

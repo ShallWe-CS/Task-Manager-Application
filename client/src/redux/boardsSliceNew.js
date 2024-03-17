@@ -47,9 +47,10 @@ const boardsSliceNew = createSlice({
 
 export const fetchAsyncBoards = createAsyncThunk('boards/fetch', async(limit) => {
     const response = await fetchDataFromApi("/api/boards/boards_by_owner/");
+    console.log('responseL: ', response)
     return response;
 });
 
-export const getAllBoards = (state) => state.boardsNew.boards;
+export const getAllBoards = (state) => state.boards.boards;
 
 export default boardsSliceNew;
