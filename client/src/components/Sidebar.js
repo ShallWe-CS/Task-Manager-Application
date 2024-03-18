@@ -30,8 +30,6 @@ function Sidebar({ isSideBarOpen, setIsSideBarOpen }) {
     setIsSideBarOpen((curr) => !curr);
   };
 
-  console.log('boards: ', boards)
-
   return (
     <div>
       <div
