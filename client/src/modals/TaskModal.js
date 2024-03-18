@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ElipsisMenu from "../components/ElipsisMenu";
 import elipsis from "../assets/icon-vertical-ellipsis.svg";
-import boardsSlice from "../redux/boardsSlice";
 import Subtask from "../components/Subtask";
 import AddEditTaskModal from "./AddEditTaskModal";
 import DeleteModal from "./DeleteModal";
-import { putDataWithAuthentication, deleteDataWithAuthentication } from "../utils/api";
 import { fetchAsyncBoards } from "../redux/boardsSliceNew";
+import * as taskAPI from "../redux/api/taskAPI"
+import * as subTaskAPI from "../redux/api/subtaskAPI"
 
 function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
   const dispatch = useDispatch();
@@ -44,18 +44,9 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
         let data = {
           subtasks : subtasks
         }
-        putDataWithAuthentication('/api/subtasks/edit/', data);
-        dispatch(fetchAsyncBoards());
+        subTaskAPI.editSubtask(data).then(() => dispatch(fetchAsyncBoards()));
       }
     }
-    // dispatch(
-    //   boardsSlice.actions.setTaskStatus({
-    //     taskIndex,
-    //     colIndex,
-    //     newColIndex,
-    //     status,
-    //   })
-    // );
     setIsTaskModalOpen(false);
   };
 
@@ -72,9 +63,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
 
   const onDeleteBtnClick = (e) => {
     if (e.target.textContent === "Delete") {
-      deleteDataWithAuthentication(`/api/tasks/${taskDetails.id}/delete/`)
-      dispatch(fetchAsyncBoards());
-      // dispatch(boardsSlice.actions.deleteTask({ taskIndex, colIndex }));
+      taskAPI.deleteTask(taskDetails.id).then(() => dispatch(fetchAsyncBoards()))
       setIsTaskModalOpen(false);
       setIsDeleteModalOpen(false);
     } else {
