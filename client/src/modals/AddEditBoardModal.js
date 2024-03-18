@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import crossIcon from "../assets/icon-cross.svg";
 import { v4 as uuidv4 } from "uuid";
 import { useDispatch, useSelector } from "react-redux";
-import { putDataWithAuthentication, postDataToApi } from "../utils/api";
 import { fetchAsyncBoards } from "../redux/boardsSliceNew";
 import * as boardAPI from "../redux/api/boardAPI"
 
@@ -103,7 +102,7 @@ function AddEditBoardModal({ setIsBoardModalOpen, type }) {
     if (type === "add") {
       boardAPI.addBoard(data).then(() => dispatch(fetchAsyncBoards()));
     } else {
-      putDataWithAuthentication(`/api/boards/${currentBoard.id}/edit/`, data);
+      boardAPI.editBoard(currentBoard.id, data).then(() => dispatch(fetchAsyncBoards()));
     }
   };
 
@@ -148,13 +147,6 @@ function AddEditBoardModal({ setIsBoardModalOpen, type }) {
           </label>
 
           {combinedColumns.map((column, index) => (
-            // <ColumnInput
-            //   key={index}
-            //   id={column.id}
-            //   value={column.name}
-            //   onChange={onChange}
-            //   onDelete={onDelete}
-            // />
             <div key={index} className=" flex items-center w-full ">
               <input
                 className=" bg-transparent flex-grow px-4 py-2 rounded-md text-sm  border-[0.5px] border-gray-600 focus:outline-[#635fc7] outline-[1px]  "

@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import crossIcon from "../assets/icon-cross.svg";
-import boardsSlice from "../redux/boardsSlice";
-import { postDataToApi, putDataWithAuthentication, deleteDataWithAuthentication } from "../utils/api";
 import { fetchAsyncBoards } from "../redux/boardsSliceNew";
+import * as taskAPI from "../redux/api/taskAPI"
 
 function AddEditTaskModal({
   type,
@@ -128,36 +127,11 @@ function AddEditTaskModal({
       deleteSubtasks: deleteSubtasks,
       newSubtasks: newSubtasks
     }
-    if(type == "edit"){
-      putDataWithAuthentication(`/api/tasks/${taskDetails.id}/edit/`, data)
+    if(type == "add"){
+      taskAPI.addTask(data).then(() => dispatch(fetchAsyncBoards()));
     }else{
-      postDataToApi(`/api/tasks/add/`, data)
+      taskAPI.editTask(taskDetails.id, data).then(() => dispatch(fetchAsyncBoards()));
     }
-    dispatch(fetchAsyncBoards());
-
-    // if (type === "add") {
-    //   dispatch(
-    //     boardsSlice.actions.addTask({
-    //       title,
-    //       description,
-    //       subtasks,
-    //       status,
-    //       newColIndex,
-    //     })
-    //   );
-    // } else {
-    //   dispatch(
-    //     boardsSlice.actions.editTask({
-    //       title,
-    //       description,
-    //       subtasks,
-    //       status,
-    //       taskIndex,
-    //       prevColIndex,
-    //       newColIndex,
-    //     })
-    //   );
-    // }
   };
 
   return (

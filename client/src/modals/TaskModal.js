@@ -1,24 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ElipsisMenu from "../components/ElipsisMenu";
 import elipsis from "../assets/icon-vertical-ellipsis.svg";
-import boardsSlice from "../redux/boardsSlice";
 import Subtask from "../components/Subtask";
 import AddEditTaskModal from "./AddEditTaskModal";
 import DeleteModal from "./DeleteModal";
-import { putDataWithAuthentication, deleteDataWithAuthentication } from "../utils/api";
 import { fetchAsyncBoards } from "../redux/boardsSliceNew";
+import * as taskAPI from "../redux/api/taskAPI";
+import * as subTaskAPI from "../redux/api/subtaskAPI";
 
 function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
   const dispatch = useDispatch();
   const [isElipsisMenuOpen, setIsElipsisMenuOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const boards = useSelector((state) => state.boards);
+  const currentBoard = useSelector((state) => state.boardsNew.currentBoard);
+
   const board = boards.find((board) => board.isActive === true);
   const columns = board.columns;
   const col = columns.find((col, i) => i === colIndex);
-  const task = col.tasks.find((task, i) => i === taskIndex);
+  // const task = col.tasks.find((task, i) => i === taskIndex);
+  let task = taskDetails;
+  let number = 0;
   let subtasks = taskDetails.subtasks;
+  let taskCurrentStatusChanged = false;
   let subtasksChanged = false;
 
   let completed = 0;
@@ -28,11 +33,34 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
     }
   });
 
-  const [status, setStatus] = useState(task?.status);
+  const [status, setStatus] = useState(taskDetails?.status);
   const [newColIndex, setNewColIndex] = useState(columns.indexOf(col));
+
+  useEffect(() => {
+    return () => {
+      if (taskCurrentStatusChanged) {
+        taskAPI
+          .editTask(taskDetails.id, task)
+          .then(() => dispatch(fetchAsyncBoards()));
+      }
+    };
+  }, []);
+
   const onChange = (e) => {
+    taskCurrentStatusChanged = true;
+
+    // Find the column object based on the name
+    const column = currentBoard.columns.find(
+      (column) => column.name === e.target.value
+    );
+
+    // Update the task object with the new status value
+    const updatedTask = { ...task, status: e.target.value, column: column.id };
+    task = updatedTask;
+    number = 2;
+
     setStatus(e.target.value);
-    setNewColIndex(e.target.selectedIndex);
+    // setNewColIndex(e.target.selectedIndex);
   };
 
   // onClose TaskModel send completed subtask call
@@ -40,41 +68,33 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
     if (e.target !== e.currentTarget) {
       return;
     } else {
-      if(subtasksChanged) {
+      if (subtasksChanged) {
         let data = {
-          subtasks : subtasks
-        }
-        putDataWithAuthentication('/api/subtasks/edit/', data);
-        dispatch(fetchAsyncBoards());
+          subtasks: subtasks,
+        };
+        subTaskAPI.editSubtask(data).then(() => dispatch(fetchAsyncBoards()));
+      } else if (taskCurrentStatusChanged) {
+        // taskAPI.editTask()
       }
     }
-    // dispatch(
-    //   boardsSlice.actions.setTaskStatus({
-    //     taskIndex,
-    //     colIndex,
-    //     newColIndex,
-    //     status,
-    //   })
-    // );
     setIsTaskModalOpen(false);
   };
 
   const changeSubtaskStatus = (id) => {
-
     const updatedSubtasks = subtasks.map((subtask) =>
-    subtask.id === id
-      ? { ...subtask, is_completed: !subtask.is_completed }
-      : subtask
+      subtask.id === id
+        ? { ...subtask, is_completed: !subtask.is_completed }
+        : subtask
     );
     subtasksChanged = true;
     subtasks = updatedSubtasks;
-  }
+  };
 
   const onDeleteBtnClick = (e) => {
     if (e.target.textContent === "Delete") {
-      deleteDataWithAuthentication(`/api/tasks/${taskDetails.id}/delete/`)
-      dispatch(fetchAsyncBoards());
-      // dispatch(boardsSlice.actions.deleteTask({ taskIndex, colIndex }));
+      taskAPI
+        .deleteTask(taskDetails.id)
+        .then(() => dispatch(fetchAsyncBoards()));
       setIsTaskModalOpen(false);
       setIsDeleteModalOpen(false);
     } else {
@@ -121,8 +141,8 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
             />
           )}
         </div>
-        <p className=" text-gray-500 font-[600] tracking-wide text-xs pt-6">
-          {task?.description}
+        <p className=" text-gray-500 font-[800] tracking-wide text-sm pt-6">
+          {taskDetails?.description}
         </p>
 
         <p className=" pt-6 text-gray-500 tracking-widest text-sm">
@@ -157,7 +177,7 @@ function TaskModal({ taskIndex, colIndex, setIsTaskModalOpen, taskDetails }) {
             value={status}
             onChange={onChange}
           >
-            {columns.map((col, index) => (
+            {currentBoard.columns.map((col, index) => (
               <option className="status-options" key={index}>
                 {col.name}
               </option>
